@@ -1,11 +1,12 @@
 package handlers
 
 import (
-	"github.com/bal3000/BalStreamer2/api/nfrastructure"
+	"testing"
+
+	"github.com/bal3000/BalStreamer2/api/infrastructure"
 	"github.com/bal3000/BalStreamer2/api/models"
 	"github.com/streadway/amqp"
 	"github.com/stretchr/testify/mock"
-	"testing"
 )
 
 var (
