@@ -14,11 +14,12 @@ import (
 
 type Server struct {
 	Router *mux.Router
+	Caster infrastructure.Caster
 	Config infrastructure.Configuration
 }
 
-func NewServer(r *mux.Router, config infrastructure.Configuration) *Server {
-	return &Server{Router: r, Config: config}
+func NewServer(r *mux.Router, c infrastructure.Caster, config infrastructure.Configuration) *Server {
+	return &Server{Router: r, Caster: c, Config: config}
 }
 
 func (s *Server) Run() error {

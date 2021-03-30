@@ -2,6 +2,7 @@ package main
 
 import (
 	"fmt"
+	"log"
 	"os"
 
 	"github.com/bal3000/BalStreamer2/api/app"
@@ -23,8 +24,15 @@ func main() {
 }
 
 func run() error {
+	// set up g mux router
 	r := mux.NewRouter()
 
-	server := app.NewServer(r, config)
+	// setup grpc client
+	caster, err := infrastructure.NewCasterConnection(config.CasterURL)
+	if err != nil {
+		log.Fatalf("failed to connect to caster: %v", err)
+	}
+
+	server := app.NewServer(r, caster, config)
 	return server.Run()
 }

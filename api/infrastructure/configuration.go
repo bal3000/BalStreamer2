@@ -15,6 +15,7 @@ type Configuration struct {
 	Durable          bool   `json:"durable"`
 	LiveStreamURL    string `json:"liveStreamUrl"`
 	APIKey           string `json:"apiKey"`
+	CasterURL        string `json:"casterUrl"`
 }
 
 // ReadConfig reads the json file and popluates the Configuration struct
