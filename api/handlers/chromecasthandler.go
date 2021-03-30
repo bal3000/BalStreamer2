@@ -6,8 +6,6 @@ import (
 	"log"
 	"net/http"
 
-	"github.com/bal3000/BalStreamer2/api/infrastructure"
-
 	"github.com/bal3000/BalStreamer2/api/models"
 	"github.com/gorilla/websocket"
 	"github.com/streadway/amqp"
@@ -23,13 +21,12 @@ var (
 
 // ChromecastHandler the controller for the websockets
 type ChromecastHandler struct {
-	RabbitMQ  infrastructure.RabbitMQ
 	QueueName string
 }
 
 // NewChromecastHandler creates a new ref to chromecast controller
-func NewChromecastHandler(rabbit infrastructure.RabbitMQ, qn string) *ChromecastHandler {
-	return &ChromecastHandler{RabbitMQ: rabbit, QueueName: qn}
+func NewChromecastHandler(qn string) *ChromecastHandler {
+	return &ChromecastHandler{QueueName: qn}
 }
 
 // ChromecastUpdates broadcasts a chromecast to all clients once found
@@ -54,18 +51,7 @@ func (handler *ChromecastHandler) ChromecastUpdates(res http.ResponseWriter, req
 		}
 	}
 
-	err = handler.RabbitMQ.StartConsumer("chromecast-key", processMsgs, 2)
-	if err != nil {
-		panic(err)
-	}
-
-	for msg := range handledMsgs {
-		err = ws.WriteJSON(msg)
-		if err != nil {
-			log.Fatalln(err)
-		}
-	}
-	close(handledMsgs)
+	// get from caster via grpc
 }
 
 func processMsgs(d amqp.Delivery) bool {

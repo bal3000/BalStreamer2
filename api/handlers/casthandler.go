@@ -2,10 +2,8 @@ package handlers
 
 import (
 	"encoding/json"
-	"github.com/bal3000/BalStreamer2/api/infrastructure"
 	"log"
 	"net/http"
-	"time"
 
 	"github.com/bal3000/BalStreamer2/api/models"
 )
@@ -14,13 +12,12 @@ const routingKey string = "chromecast-key"
 
 // CastHandler - controller for casting to chromecast
 type CastHandler struct {
-	RabbitMQ     infrastructure.RabbitMQ
 	ExchangeName string
 }
 
 // NewCastHandler - constructor to return new controller while passing in dependencies
-func NewCastHandler(rabbit infrastructure.RabbitMQ, en string) *CastHandler {
-	return &CastHandler{RabbitMQ: rabbit, ExchangeName: en}
+func NewCastHandler(en string) *CastHandler {
+	return &CastHandler{ExchangeName: en}
 }
 
 // CastStream - streams given data to given chromecast
@@ -34,13 +31,13 @@ func (handler *CastHandler) CastStream(res http.ResponseWriter, req *http.Reques
 	}
 
 	// Send to chromecast
-	cast := &models.StreamToChromecastEvent{
-		ChromeCastToStream: castCommand.Chromecast,
-		Stream:             castCommand.StreamURL,
-		StreamDate:         time.Now(),
-	}
+	// cast := &models.StreamToChromecastEvent{
+	// 	ChromeCastToStream: castCommand.Chromecast,
+	// 	Stream:             castCommand.StreamURL,
+	// 	StreamDate:         time.Now(),
+	// }
 
-	go handler.RabbitMQ.SendMessage(routingKey, cast)
+	// send to caster here via grpc
 
 	res.WriteHeader(http.StatusNoContent)
 }
@@ -56,12 +53,12 @@ func (handler *CastHandler) StopStream(res http.ResponseWriter, req *http.Reques
 	}
 
 	// Send to chromecast
-	cast := &models.StopPlayingStreamEvent{
-		ChromeCastToStop: stopStreamCommand.ChromeCastToStop,
-		StopDateTime:     stopStreamCommand.StopDateTime,
-	}
+	// cast := &models.StopPlayingStreamEvent{
+	// 	ChromeCastToStop: stopStreamCommand.ChromeCastToStop,
+	// 	StopDateTime:     stopStreamCommand.StopDateTime,
+	// }
 
-	go handler.RabbitMQ.SendMessage(routingKey, cast)
+	// send to caster here via grpc
 
 	res.WriteHeader(http.StatusAccepted)
 }

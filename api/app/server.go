@@ -13,13 +13,12 @@ import (
 )
 
 type Server struct {
-	RabbitMQ infrastructure.RabbitMQ
-	Router   *mux.Router
-	Config   infrastructure.Configuration
+	Router *mux.Router
+	Config infrastructure.Configuration
 }
 
-func NewServer(rabbit infrastructure.RabbitMQ, r *mux.Router, config infrastructure.Configuration) *Server {
-	return &Server{RabbitMQ: rabbit, Router: r, Config: config}
+func NewServer(r *mux.Router, config infrastructure.Configuration) *Server {
+	return &Server{Router: r, Config: config}
 }
 
 func (s *Server) Run() error {

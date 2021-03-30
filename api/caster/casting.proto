@@ -1,0 +1,25 @@
+syntax = "proto3";
+
+option go_package = "github.com/bal3000/BalStreamer2/api/caster";
+
+import "google/protobuf/empty.proto";
+
+package casting;
+
+service Casting {
+	rpc CastStream (CastStartRequest) returns (CastStartResponse);
+	rpc StopStream (StopStreamRequest) returns (google.protobuf.Empty);
+}
+
+message CastStartRequest {
+	string chromecast = 1;
+	string stream = 2;
+}
+
+message CastStartResponse {
+	bool success = 1;
+}
+
+message StopStreamRequest {
+	string chromecast = 1;
+}

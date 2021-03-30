@@ -14,29 +14,55 @@ namespace BalStreamer2.Caster.Services
         public ChromecastService(IChromeCastHelper chromecastHelper)
         {
             _chromecastHelper = chromecastHelper;
+            _chromecastHelper.DiscoverChromecasts();
         }
 
         public override async Task FindChromecasts(Empty request, IServerStreamWriter<FindChromecastsResponse> responseStream, ServerCallContext context)
         {
-            // send inital list
-            foreach (var cast in _chromecastHelper.RendererItems)
-            {
-                await responseStream.WriteAsync(new FindChromecastsResponse
-                {
-                    ChromecastName = cast.Name,
-                    ChromecastStatus = Protos.Status.Found
-                });
-            }
+            // var chromecasts = new List<string>();
 
             while (!context.CancellationToken.IsCancellationRequested)
             {
-                // hook up to chromecast events
-
-                await responseStream.WriteAsync(new FindChromecastsResponse
+                foreach (var cast in _chromecastHelper.RendererItems)
                 {
-                    ChromecastName = "",
-                    ChromecastStatus = Protos.Status.Found
-                });
+                    await responseStream.WriteAsync(new FindChromecastsResponse
+                    {
+                        ChromecastName = cast.Name,
+                        ChromecastStatus = Protos.Status.Found
+                    });
+                }
+
+                // PUT TO ONE SIDE TO TRY A MORE SIMPLE APPROACH
+                // // Add new found chromecasts
+                // foreach (var item in _chromecastHelper.RendererItems)
+                // {
+                //     if (!chromecasts.Contains(item.Name))
+                //     {
+                //         chromecasts.Add(item.Name);
+                //         await responseStream.WriteAsync(new FindChromecastsResponse
+                //         {
+                //             ChromecastName = item.Name,
+                //             ChromecastStatus = Protos.Status.Found
+                //         });
+                //     }
+                // }
+
+                // // remove lost chromecasts
+                // var lostCasts = new List<string>();
+                // foreach (var item in chromecasts)
+                // {
+                //     if (!_chromecastHelper.RendererItems.Any(a => a.Name == item))
+                //     {
+                //         lostCasts.Add(item);
+                //         await responseStream.WriteAsync(new FindChromecastsResponse
+                //         {
+                //             ChromecastName = item,
+                //             ChromecastStatus = Protos.Status.Lost
+                //         });
+                //     }
+                // }
+
+                // chromecasts.RemoveAll(c => lostCasts.Contains(c));
 
                 await Task.Delay(TimeSpan.FromSeconds(1));
             }

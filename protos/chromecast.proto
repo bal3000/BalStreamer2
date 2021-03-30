@@ -1,0 +1,21 @@
+syntax = "proto3";
+
+option csharp_namespace = "BalStreamer2.Caster.Protos";
+
+import "google/protobuf/empty.proto";
+
+package chromecast;
+
+service Chromecast {
+	rpc FindChromecasts (google.protobuf.Empty) returns (stream FindChromecastsResponse);
+}
+
+enum Status {
+  FOUND = 0;
+  LOST = 1;
+}
+
+message FindChromecastsResponse {
+	string chromecastName = 1;
+	Status chromecastStatus = 2;
+} 
