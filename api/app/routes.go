@@ -11,7 +11,7 @@ import (
 func (s *Server) SetRoutes() {
 	// Handlers
 	cast := handlers.NewCastHandler(s.Caster)
-	chrome := handlers.NewChromecastHandler(s.Config.QueueName)
+	chrome := handlers.NewChromecastHandler(s.Caster)
 	live := handlers.NewLiveStreamHandler(s.Config.LiveStreamURL, s.Config.APIKey)
 
 	CastRoutes(s.Router, cast)

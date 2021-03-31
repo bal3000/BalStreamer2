@@ -1,32 +1,28 @@
 package handlers
 
 import (
-	"encoding/json"
-	"fmt"
+	"io"
 	"log"
 	"net/http"
 
+	"github.com/bal3000/BalStreamer2/api/infrastructure"
 	"github.com/bal3000/BalStreamer2/api/models"
 	"github.com/gorilla/websocket"
-	"github.com/streadway/amqp"
 )
 
 var (
-	upgrader       = websocket.Upgrader{}
-	foundEventType = "ChromecastFoundEvent"
-	lostEventType  = "ChromecastLostEvent"
-	chromecasts    = make(map[string]models.ChromecastEvent)
-	handledMsgs    = make(chan models.ChromecastEvent)
+	upgrader    = websocket.Upgrader{}
+	chromecasts = make(map[string]models.ChromecastEvent)
 )
 
 // ChromecastHandler the controller for the websockets
 type ChromecastHandler struct {
-	QueueName string
+	Caster infrastructure.Caster
 }
 
 // NewChromecastHandler creates a new ref to chromecast controller
-func NewChromecastHandler(qn string) *ChromecastHandler {
-	return &ChromecastHandler{QueueName: qn}
+func NewChromecastHandler(caster infrastructure.Caster) *ChromecastHandler {
+	return &ChromecastHandler{Caster: caster}
 }
 
 // ChromecastUpdates broadcasts a chromecast to all clients once found
@@ -44,7 +40,7 @@ func (handler *ChromecastHandler) ChromecastUpdates(res http.ResponseWriter, req
 
 	log.Printf("Current chromecasts, %v", len(chromecasts))
 	for _, event := range chromecasts {
-		log.Printf("sending chromecast, %s", event)
+		log.Printf("sending chromecast, %v", event)
 		err = ws.WriteJSON(event)
 		if err != nil {
 			log.Fatalln(err)
@@ -52,27 +48,40 @@ func (handler *ChromecastHandler) ChromecastUpdates(res http.ResponseWriter, req
 	}
 
 	// get from caster via grpc
-}
-
-func processMsgs(d amqp.Delivery) bool {
-	fmt.Printf("processing message: %s, with type: %s", string(d.Body), d.Type)
-	event := new(models.ChromecastEvent)
-
-	// convert mass transit message
-	err := json.Unmarshal(d.Body, event)
+	stream, err := handler.Caster.FindChromecasts()
 	if err != nil {
-		log.Println(err)
-		return false
+		log.Fatalln(err)
 	}
 
-	switch d.Type {
-	case foundEventType:
-		chromecasts[event.Chromecast] = *event
-	case lostEventType:
-		delete(chromecasts, event.Chromecast)
-	}
+	wait := make(chan bool)
 
-	handledMsgs <- *event
+	go func() {
+		for {
+			event, err := stream.Recv()
+			if err == io.EOF {
+				// read done.
+				close(wait)
+				return
+			}
+			if err != nil {
+				log.Fatalf("Failed to receive a chromecast : %v", err)
+			}
+			log.Printf("Got chromecast %s with status %v", event.ChromecastName, event.ChromecastStatus)
 
-	return true
+			chromecast := models.ChromecastEvent{
+				Name: event.ChromecastName,
+				Lost: event.ChromecastStatus == 1,
+			}
+
+			if chromecast.Lost {
+				delete(chromecasts, chromecast.Name)
+			} else {
+				chromecasts[chromecast.Name] = chromecast
+			}
+
+			ws.WriteJSON(chromecast)
+		}
+	}()
+
+	<-wait
 }

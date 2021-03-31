@@ -7,11 +7,13 @@ import (
 
 	caster "github.com/bal3000/BalStreamer2/api/caster"
 	"google.golang.org/grpc"
+	"google.golang.org/protobuf/types/known/emptypb"
 )
 
 type Caster interface {
 	CastStreamToChromecast(chromecast string, streamURL string) (*caster.CastStartResponse, error)
 	StopStream(chromecast string) error
+	FindChromecasts() (caster.Chromecast_FindChromecastsClient, error)
 }
 
 type casterConnection struct {
@@ -48,4 +50,10 @@ func (c *casterConnection) StopStream(chromecast string) error {
 	defer cancel()
 	_, err := c.castingClient.StopStream(ctx, &caster.StopStreamRequest{Chromecast: chromecast})
 	return err
+}
+
+func (c *casterConnection) FindChromecasts() (caster.Chromecast_FindChromecastsClient, error) {
+	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
+	defer cancel()
+	return c.chromecastClient.FindChromecasts(ctx, &emptypb.Empty{})
 }

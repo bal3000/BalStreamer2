@@ -25,7 +25,8 @@ type StopPlayingStreamEvent struct {
 
 // ChromecastEvent event when a chromecast is found
 type ChromecastEvent struct {
-	Chromecast string `json:"chromecast"`
+	Name string `json:"name"`
+	Lost bool   `json:"lost"`
 }
 
 // TransformMessage transforms the message to a masstransit one and then turns into JSON
