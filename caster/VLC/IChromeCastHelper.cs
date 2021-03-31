@@ -10,6 +10,8 @@ namespace BalStreamer2.Caster.VLC
 
         void DiscoverChromecasts();
 
+        void DiscoverChromecasts(Action<object, RendererDiscovererItemAddedEventArgs> chromecastFound, Action<object, RendererDiscovererItemDeletedEventArgs> chromecastLost);
+
         bool StartCasting(Uri stream, RendererItem rendererItem);
 
         void StopCasting();
