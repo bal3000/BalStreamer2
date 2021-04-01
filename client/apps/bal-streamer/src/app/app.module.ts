@@ -14,9 +14,10 @@ import { CastService } from './services/cast.service';
 import { LivestreamingService } from './services/livestreaming.service';
 import { ChromecastService } from './services/chromecast.service';
 import { AppShellModule } from './app-shell/app-shell.module';
+import { HeaderComponent } from './components/header/header.component';
 
 @NgModule({
-  declarations: [AppComponent],
+  declarations: [AppComponent, HeaderComponent],
   imports: [
     BrowserModule,
     HttpClientModule,
