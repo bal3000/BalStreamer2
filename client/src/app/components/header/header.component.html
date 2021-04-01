@@ -1,4 +1,0 @@
-<h2>Selected: {{ selectedChromecast$ | async }}</h2>
-<ul>
-    <li *ngFor="let name of chromecasts$ | async as list" (click)="selectChromecast(name)" >{{ name }}</li>
-</ul>
