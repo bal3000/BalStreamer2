@@ -2,6 +2,7 @@ package infrastructure
 
 import (
 	"context"
+	"io"
 	"log"
 	"time"
 
@@ -13,30 +14,32 @@ import (
 type Caster interface {
 	CastStreamToChromecast(chromecast string, streamURL string) (*caster.CastStartResponse, error)
 	StopStream(chromecast string) error
-	FindChromecasts() (caster.Chromecast_FindChromecastsClient, error)
+	FindChromecasts(eventHandler func(name string, lost bool))
+	CloseConnection() error
 }
 
 type casterConnection struct {
 	castingClient    caster.CastingClient
 	chromecastClient caster.ChromecastClient
+	conn             *grpc.ClientConn
 }
 
 func NewCasterConnection(casterUrl string) (Caster, error) {
 	var opts []grpc.DialOption
 	opts = append(opts, grpc.WithInsecure())
-	opts = append(opts, grpc.WithBlock())
 
-	conn, err := grpc.Dial(casterUrl, opts...)
+	log.Printf("Connecting to caster at %s", casterUrl)
+	conn, err := grpc.Dial(":5000", opts...)
 	if err != nil {
 		log.Fatalf("failed to dial: %v", err)
 		return nil, err
 	}
-	defer conn.Close()
+	log.Printf("Connected to caster at %s", casterUrl)
 
 	castingClient := caster.NewCastingClient(conn)
 	chromecastClient := caster.NewChromecastClient(conn)
 
-	return &casterConnection{castingClient, chromecastClient}, nil
+	return &casterConnection{castingClient, chromecastClient, conn}, nil
 }
 
 func (c *casterConnection) CastStreamToChromecast(chromecast string, streamURL string) (*caster.CastStartResponse, error) {
@@ -52,8 +55,28 @@ func (c *casterConnection) StopStream(chromecast string) error {
 	return err
 }
 
-func (c *casterConnection) FindChromecasts() (caster.Chromecast_FindChromecastsClient, error) {
-	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
+func (c *casterConnection) FindChromecasts(eventHandler func(name string, lost bool)) {
+	ctx, cancel := context.WithTimeout(context.Background(), 1*time.Hour)
 	defer cancel()
-	return c.chromecastClient.FindChromecasts(ctx, &emptypb.Empty{})
+	stream, err := c.chromecastClient.FindChromecasts(ctx, &emptypb.Empty{})
+	if err != nil {
+		log.Fatalf("failed to get chromecast stream: %v", err)
+	}
+
+	for {
+		event, err := stream.Recv()
+		if err == io.EOF {
+			// read done.
+			break
+		}
+		if err != nil {
+			log.Fatalf("Failed to receive a chromecast : %v", err)
+		}
+		log.Printf("Got chromecast %s with status %v", event.ChromecastName, event.ChromecastStatus)
+		go eventHandler(event.ChromecastName, event.ChromecastStatus == caster.Status_LOST)
+	}
+}
+
+func (c *casterConnection) CloseConnection() error {
+	return c.conn.Close()
 }

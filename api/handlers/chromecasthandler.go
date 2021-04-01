@@ -1,7 +1,6 @@
 package handlers
 
 import (
-	"io"
 	"log"
 	"net/http"
 
@@ -11,8 +10,9 @@ import (
 )
 
 var (
-	upgrader    = websocket.Upgrader{}
-	chromecasts = make(map[string]models.ChromecastEvent)
+	upgrader           = websocket.Upgrader{}
+	chromecasts        = make(map[string]models.ChromecastEvent)
+	handledChromecasts = make(chan models.ChromecastEvent)
 )
 
 // ChromecastHandler the controller for the websockets
@@ -36,52 +36,31 @@ func (handler *ChromecastHandler) ChromecastUpdates(res http.ResponseWriter, req
 	}
 	defer ws.Close()
 
-	// send all chromecasts from last refresh to page
+	// get from caster via grpc
+	handler.Caster.FindChromecasts(handleChromecastEvent)
 
-	log.Printf("Current chromecasts, %v", len(chromecasts))
-	for _, event := range chromecasts {
-		log.Printf("sending chromecast, %v", event)
-		err = ws.WriteJSON(event)
+	for cast := range handledChromecasts {
+		log.Printf("sending chromecast %s with status %v", cast.Name, cast.Lost)
+		err = ws.WriteJSON(cast)
 		if err != nil {
 			log.Fatalln(err)
 		}
 	}
+	close(handledChromecasts)
+}
 
-	// get from caster via grpc
-	stream, err := handler.Caster.FindChromecasts()
-	if err != nil {
-		log.Fatalln(err)
+func handleChromecastEvent(name string, lost bool) {
+	log.Printf("handling chromecast %s with status %v", name, lost)
+	chromecast := models.ChromecastEvent{
+		Name: name,
+		Lost: lost,
 	}
 
-	wait := make(chan bool)
+	if chromecast.Lost {
+		delete(chromecasts, chromecast.Name)
+	} else {
+		chromecasts[chromecast.Name] = chromecast
+	}
 
-	go func() {
-		for {
-			event, err := stream.Recv()
-			if err == io.EOF {
-				// read done.
-				close(wait)
-				return
-			}
-			if err != nil {
-				log.Fatalf("Failed to receive a chromecast : %v", err)
-			}
-			log.Printf("Got chromecast %s with status %v", event.ChromecastName, event.ChromecastStatus)
-
-			chromecast := models.ChromecastEvent{
-				Name: event.ChromecastName,
-				Lost: event.ChromecastStatus == 1,
-			}
-
-			if chromecast.Lost {
-				delete(chromecasts, chromecast.Name)
-			} else {
-				chromecasts[chromecast.Name] = chromecast
-			}
-
-			ws.WriteJSON(chromecast)
-		}
-	}()
-
-	<-wait
+	handledChromecasts <- chromecast
 }

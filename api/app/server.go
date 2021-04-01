@@ -37,9 +37,10 @@ func (s *Server) Run() error {
 	}
 
 	// Start server
+
+	log.Println("Started Server on port 8080")
 	// Run our server in a goroutine so that it doesn't block.
 	go func() {
-		log.Println("Started Server on port 8080")
 		if err := srv.ListenAndServe(); err != nil {
 			log.Println(err)
 		}

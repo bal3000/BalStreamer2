@@ -30,13 +30,6 @@ func (handler *CastHandler) CastStream(res http.ResponseWriter, req *http.Reques
 		log.Println(err)
 	}
 
-	// Send to chromecast
-	// cast := &models.StreamToChromecastEvent{
-	// 	ChromeCastToStream: castCommand.Chromecast,
-	// 	Stream:             castCommand.StreamURL,
-	// 	StreamDate:         time.Now(),
-	// }
-
 	// send to caster here via grpc
 	response, err := handler.Caster.CastStreamToChromecast(castCommand.Chromecast, castCommand.StreamURL)
 	if err != nil {
@@ -60,12 +53,6 @@ func (handler *CastHandler) StopStream(res http.ResponseWriter, req *http.Reques
 	if err := json.NewDecoder(req.Body).Decode(stopStreamCommand); err != nil {
 		log.Println(err)
 	}
-
-	// Send to chromecast
-	// cast := &models.StopPlayingStreamEvent{
-	// 	ChromeCastToStop: stopStreamCommand.ChromeCastToStop,
-	// 	StopDateTime:     stopStreamCommand.StopDateTime,
-	// }
 
 	// send to caster here via grpc
 	err := handler.Caster.StopStream(stopStreamCommand.ChromeCastToStop)

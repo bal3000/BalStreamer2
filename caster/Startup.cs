@@ -32,6 +32,7 @@ namespace BalStreamer2.Caster
             app.UseEndpoints(endpoints =>
             {
                 endpoints.MapGrpcService<CastingService>();
+                endpoints.MapGrpcService<ChromecastService>();
 
                 endpoints.MapGet("/", async context =>
                 {

@@ -32,6 +32,11 @@ func run() error {
 	if err != nil {
 		log.Fatalf("failed to connect to caster: %v", err)
 	}
+	defer func() {
+		if err := caster.CloseConnection(); err != nil {
+			log.Fatalf("failed to close connection to caster: %v", err)
+		}
+	}()
 
 	server := app.NewServer(r, caster, config)
 	return server.Run()
