@@ -73,7 +73,7 @@ func (c *casterConnection) FindChromecasts(eventHandler func(name string, lost b
 			log.Fatalf("Failed to receive a chromecast : %v", err)
 		}
 		log.Printf("Got chromecast %s with status %v", event.ChromecastName, event.ChromecastStatus)
-		go eventHandler(event.ChromecastName, event.ChromecastStatus == caster.Status_LOST)
+		eventHandler(event.ChromecastName, event.ChromecastStatus == caster.Status_LOST)
 	}
 }
 

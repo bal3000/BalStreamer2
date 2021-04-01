@@ -37,7 +37,7 @@ func (handler *ChromecastHandler) ChromecastUpdates(res http.ResponseWriter, req
 	defer ws.Close()
 
 	// get from caster via grpc
-	handler.Caster.FindChromecasts(handleChromecastEvent)
+	go handler.Caster.FindChromecasts(handleChromecastEvent)
 
 	for cast := range handledChromecasts {
 		log.Printf("sending chromecast %s with status %v", cast.Name, cast.Lost)
