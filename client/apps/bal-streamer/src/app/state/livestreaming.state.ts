@@ -4,8 +4,10 @@ import produce from 'immer';
 import { tap } from 'rxjs/operators';
 
 import { LiveFixture } from '../models/live-fixture';
+import { Streams } from '../models/streams';
 import { LivestreamingService } from '../services/livestreaming.service';
 import {
+  GetStreams,
   PopulateFixtures,
   SelectFixture,
 } from './actions/livestreaming.actions';
@@ -13,6 +15,7 @@ import {
 export interface LiveStreamingStateModel {
   fixtures: LiveFixture[];
   selectedFixture: LiveFixture | undefined;
+  streams: { [key: string]: Streams };
 }
 
 @State<LiveStreamingStateModel>({
@@ -20,6 +23,7 @@ export interface LiveStreamingStateModel {
   defaults: {
     fixtures: [],
     selectedFixture: undefined,
+    streams: {},
   },
 })
 @Injectable()
@@ -27,19 +31,23 @@ export class LiveStreamingState {
   constructor(private readonly streamingService: LivestreamingService) {}
 
   @Selector()
-  // tslint:disable-next-line: typedef
   static fixtures(state: LiveStreamingStateModel) {
     return state.fixtures;
   }
 
   @Selector()
-  // tslint:disable-next-line: typedef
   static selectedFixture(state: LiveStreamingStateModel) {
     return state.selectedFixture;
   }
 
+  @Selector()
+  static selectFixtureStreams(state: LiveStreamingStateModel) {
+    return (timerId: string) => {
+      return state.streams[timerId];
+    };
+  }
+
   @Action(PopulateFixtures)
-  // tslint:disable-next-line: typedef
   populateFixtures(
     ctx: StateContext<LiveStreamingStateModel>,
     action: PopulateFixtures
@@ -63,7 +71,6 @@ export class LiveStreamingState {
   }
 
   @Action(SelectFixture)
-  // tslint:disable-next-line: typedef
   selectFixture(
     ctx: StateContext<LiveStreamingStateModel>,
     action: SelectFixture
@@ -71,6 +78,24 @@ export class LiveStreamingState {
     ctx.setState(
       produce((draft) => {
         draft.selectedFixture = action.fixture;
+      })
+    );
+  }
+
+  @Action(GetStreams)
+  getStreams(ctx: StateContext<LiveStreamingStateModel>, action: GetStreams) {
+    // if it already exists, return
+    if (ctx.getState().streams[action.timerId]) {
+      return;
+    }
+
+    return this.streamingService.getStreams(action.timerId).pipe(
+      tap((results) => {
+        ctx.setState(
+          produce((draft) => {
+            draft.streams[action.timerId] = results;
+          })
+        );
       })
     );
   }

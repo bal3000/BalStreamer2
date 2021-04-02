@@ -1,8 +1,11 @@
 import { Injectable } from '@angular/core';
 import { Action, Selector, State, StateContext } from '@ngxs/store';
 import produce from 'immer';
+import { tap } from 'rxjs/operators';
+import { CastService } from '../services/cast.service';
 import {
   AddChromecast,
+  CastToChromecast,
   RemoveChromecast,
   SetSelectedChromecast,
 } from './actions/chromecasts.actions';
@@ -10,6 +13,7 @@ import {
 export interface ChromecastStateModel {
   chromecasts: string[];
   selectedChromecast: string;
+  currentlyPlaying: { [key: string]: { title: string; stream: string } };
 }
 
 @State<ChromecastStateModel>({
@@ -17,24 +21,24 @@ export interface ChromecastStateModel {
   defaults: {
     chromecasts: [],
     selectedChromecast: '',
+    currentlyPlaying: {},
   },
 })
 @Injectable()
 export class ChromecastState {
+  constructor(private readonly castService: CastService) {}
+
   @Selector()
-  // tslint:disable-next-line: typedef
   static chromecasts(state: ChromecastStateModel) {
     return state.chromecasts;
   }
 
   @Selector()
-  // tslint:disable-next-line: typedef
   static selectedChromecast(state: ChromecastStateModel) {
     return state.selectedChromecast;
   }
 
   @Action(AddChromecast)
-  // tslint:disable-next-line: typedef
   addChromecast(
     ctx: StateContext<ChromecastStateModel>,
     action: AddChromecast
@@ -47,7 +51,6 @@ export class ChromecastState {
   }
 
   @Action(RemoveChromecast)
-  // tslint:disable-next-line: typedef
   removeChromecast(
     ctx: StateContext<ChromecastStateModel>,
     action: RemoveChromecast
@@ -60,7 +63,6 @@ export class ChromecastState {
   }
 
   @Action(SetSelectedChromecast)
-  // tslint:disable-next-line: typedef
   selectChromecast(
     ctx: StateContext<ChromecastStateModel>,
     action: SetSelectedChromecast
@@ -68,6 +70,23 @@ export class ChromecastState {
     ctx.setState(
       produce((draft) => {
         draft.selectedChromecast = action.chromecast;
+      })
+    );
+  }
+
+  @Action(CastToChromecast)
+  castStream(
+    ctx: StateContext<ChromecastStateModel>,
+    action: CastToChromecast
+  ) {
+    const { chromecast, title, streamURL: stream } = action;
+    return this.castService.castStream(chromecast, stream).pipe(
+      tap(() => {
+        ctx.setState(
+          produce((draft) => {
+            draft.currentlyPlaying[chromecast] = { title, stream };
+          })
+        );
       })
     );
   }

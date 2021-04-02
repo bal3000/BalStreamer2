@@ -1,0 +1,14 @@
+<div class="box-border md:box-content border-4">
+    <h3>{{ fixture.title }}</h3>
+    <ul>
+        <li>Channel: {{ fixture.broadcastChannelName }}</li>
+        <li>Source Nation: {{ fixture.broadcastNationName }}</li>
+        <li>Start: {{ fixture.utcStart }}</li>
+        <li>End: {{ fixture.utcEnd }}</li>
+    </ul>
+    <div *ngIf="selectedChromecast$ | async as chromecast">
+        <div *ngIf="streams$ | async as stream" class="inline-block mr-2 mt-2">
+            <button (click)="castStream(stream.rtmp, chromecast)" type="button" class="focus:outline-none text-white text-sm py-2.5 px-5 rounded-md bg-blue-500 hover:bg-blue-600 hover:shadow-lg">Play Stream</button>
+         </div>
+    </div>
+</div>

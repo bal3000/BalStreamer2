@@ -7,9 +7,10 @@ import { LiveStreamingRoutingModule } from './live-streaming-routing.module';
 import { LiveStreamingState } from '../../state/livestreaming.state';
 import { LiveStreamingComponent } from './live-streaming.component';
 import { FixturesComponent } from './fixtures/fixtures.component';
+import { FixtureComponent } from './fixtures/fixture/fixture.component';
 
 @NgModule({
-  declarations: [LiveStreamingComponent, FixturesComponent],
+  declarations: [LiveStreamingComponent, FixturesComponent, FixtureComponent],
   imports: [
     CommonModule,
     LiveStreamingRoutingModule,

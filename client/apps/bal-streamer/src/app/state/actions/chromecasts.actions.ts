@@ -18,3 +18,12 @@ export class SetSelectedChromecast {
   static readonly type = '[BalStreamer] Select Chromecast';
   constructor(public chromecast: string) {}
 }
+
+export class CastToChromecast {
+  static readonly type = '[BalStreamer] Cast To Chromecast';
+  constructor(
+    public title: string,
+    public streamURL: string,
+    public chromecast: string
+  ) {}
+}

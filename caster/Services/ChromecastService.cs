@@ -3,6 +3,7 @@ using BalStreamer2.Caster.VLC;
 using Google.Protobuf.WellKnownTypes;
 using Grpc.Core;
 using System;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace BalStreamer2.Caster.Services
@@ -18,6 +19,9 @@ namespace BalStreamer2.Caster.Services
 
         public override async Task FindChromecasts(Empty request, IServerStreamWriter<FindChromecastsResponse> responseStream, ServerCallContext context)
         {
+            var token = new CancellationTokenSource();
+            token.CancelAfter(30 * 60 * 1000);
+
             _chromecastHelper.DiscoverChromecasts(
                 async (_, e) =>
                 {
@@ -36,7 +40,7 @@ namespace BalStreamer2.Caster.Services
                     });
                 });
 
-            while (!context.CancellationToken.IsCancellationRequested)
+            while (!context.CancellationToken.IsCancellationRequested && !token.IsCancellationRequested)
             {
                 await Task.Delay(TimeSpan.FromSeconds(1));
             }

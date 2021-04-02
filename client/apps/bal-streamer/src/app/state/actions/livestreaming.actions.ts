@@ -14,3 +14,8 @@ export class SelectFixture {
   static readonly type = '[LiveStreaming] Select Fixture';
   constructor(public fixture: LiveFixture) {}
 }
+
+export class GetStreams {
+  static readonly type = '[LiveStreaming] Get Streams';
+  constructor(public timerId: string) {}
+}
