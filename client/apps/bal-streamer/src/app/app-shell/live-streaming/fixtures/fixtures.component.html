@@ -1,5 +1,3 @@
 <h2>Selected: {{ (selectedFixture$ | async)?.title }}</h2>
 
-<ul>
-    <li *ngFor="let fixture of fixtures$ | async as list" (click)="selectFixture(fixture)">{{ fixture.title }}</li>
-</ul>
+<client-fixture *ngFor="let fixture of fixtures$ | async as list" [fixture]="fixture"></client-fixture>

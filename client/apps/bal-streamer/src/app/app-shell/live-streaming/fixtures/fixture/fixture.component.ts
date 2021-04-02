@@ -8,6 +8,7 @@ import { LiveFixture } from '../../../../models/live-fixture';
 import { LiveStreamingState } from '../../../../state/livestreaming.state';
 import { ChromecastState } from '../../../../state/chromecast.state';
 import { CastToChromecast } from '../../../../state/actions/chromecasts.actions';
+import { GetStreams } from '../../../../state/actions/livestreaming.actions';
 
 @Component({
   selector: 'client-fixture',
@@ -28,6 +29,10 @@ export class FixtureComponent implements OnInit {
     this.streams$ = this.store
       .select(LiveStreamingState.selectFixtureStreams)
       .pipe(map((fn) => fn(this.fixture.timerId)));
+
+    if (this.fixture.timerId) {
+      this.store.dispatch(new GetStreams(this.fixture.timerId));
+    }
   }
 
   castStream(stream: string, chromecast: string): void {

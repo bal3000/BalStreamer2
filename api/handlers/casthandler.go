@@ -22,8 +22,8 @@ func NewCastHandler(caster infrastructure.Caster) *CastHandler {
 
 // CastStream - streams given data to given chromecast
 func (handler *CastHandler) CastStream(res http.ResponseWriter, req *http.Request) {
-	res.Header().Set("Access-Control-Allow-Origin", "*")
 	res.Header().Set("content-type", "application/json")
+	res.Header().Set("Access-Control-Allow-Origin", "*")
 	castCommand := new(models.StreamToCast)
 
 	if err := json.NewDecoder(req.Body).Decode(castCommand); err != nil {
@@ -46,8 +46,8 @@ func (handler *CastHandler) CastStream(res http.ResponseWriter, req *http.Reques
 
 // StopStream endpoint sends the command to stop the stream on the given chromecast
 func (handler *CastHandler) StopStream(res http.ResponseWriter, req *http.Request) {
-	res.Header().Set("Access-Control-Allow-Origin", "*")
 	res.Header().Set("content-type", "application/json")
+	res.Header().Set("Access-Control-Allow-Origin", "*")
 	stopStreamCommand := new(models.StopPlayingStream)
 
 	if err := json.NewDecoder(req.Body).Decode(stopStreamCommand); err != nil {
