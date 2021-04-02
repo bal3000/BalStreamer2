@@ -24,6 +24,11 @@ func NewCastHandler(caster infrastructure.Caster) *CastHandler {
 func (handler *CastHandler) CastStream(res http.ResponseWriter, req *http.Request) {
 	res.Header().Set("content-type", "application/json")
 	res.Header().Set("Access-Control-Allow-Origin", "*")
+
+	if req.Method == http.MethodOptions {
+		return
+	}
+
 	castCommand := new(models.StreamToCast)
 
 	if err := json.NewDecoder(req.Body).Decode(castCommand); err != nil {
@@ -35,6 +40,7 @@ func (handler *CastHandler) CastStream(res http.ResponseWriter, req *http.Reques
 	if err != nil {
 		log.Fatalf("failed to send stream to chromecast, %v", err)
 	}
+	log.Println("response Success")
 
 	if response.Success {
 		res.WriteHeader(http.StatusNoContent)
@@ -48,6 +54,11 @@ func (handler *CastHandler) CastStream(res http.ResponseWriter, req *http.Reques
 func (handler *CastHandler) StopStream(res http.ResponseWriter, req *http.Request) {
 	res.Header().Set("content-type", "application/json")
 	res.Header().Set("Access-Control-Allow-Origin", "*")
+
+	if req.Method == http.MethodOptions {
+		return
+	}
+
 	stopStreamCommand := new(models.StopPlayingStream)
 
 	if err := json.NewDecoder(req.Body).Decode(stopStreamCommand); err != nil {

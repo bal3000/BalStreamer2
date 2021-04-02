@@ -24,8 +24,8 @@ func (s *Server) SetRoutes() {
 // CastRoutes sets up the routes for the cast handler
 func CastRoutes(r *mux.Router, cast *handlers.CastHandler) {
 	s := r.PathPrefix("/api/cast").Subrouter()
-	s.HandleFunc("", cast.CastStream).Methods(http.MethodPost)
-	s.HandleFunc("", cast.StopStream).Methods(http.MethodDelete)
+	s.HandleFunc("", cast.CastStream).Methods(http.MethodPost, http.MethodOptions)
+	s.HandleFunc("", cast.StopStream).Methods(http.MethodDelete, http.MethodOptions)
 }
 
 // ChromecastRoutes sets up the routes for the chromecast handler
