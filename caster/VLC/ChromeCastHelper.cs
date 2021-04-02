@@ -9,7 +9,7 @@ namespace BalStreamer2.Caster.VLC
         private readonly LibVLC _libVLC;
         private readonly MediaPlayer _mediaPlayer;
 
-        public ChromeCastHelper()
+        public ChromeCastHelper(bool startDiscovery = false)
         {
             // Load native libvlc library
             Core.Initialize();
@@ -18,6 +18,9 @@ namespace BalStreamer2.Caster.VLC
 
             // Redirect log output to the console
             // _libVLC.Log += (sender, e) => Console.WriteLine($"[{e.Level}] {e.Module}:{e.Message}");
+
+            if (startDiscovery)
+                DiscoverChromecasts();
         }
 
         public List<RendererItem> RendererItems { get; set; } = new List<RendererItem>();
@@ -70,7 +73,7 @@ namespace BalStreamer2.Caster.VLC
 
             RendererItems.Add(e.RendererItem);
 
-            ChromecastFound.Invoke(this, e);
+            ChromecastFound?.Invoke(this, e);
         }
 
         protected void RendererDiscoverer_ItemDeleted(object sender, RendererDiscovererItemDeletedEventArgs e)
@@ -79,7 +82,7 @@ namespace BalStreamer2.Caster.VLC
 
             RendererItems.Remove(e.RendererItem);
 
-            ChromecastLost.Invoke(this, e);
+            ChromecastLost?.Invoke(this, e);
         }
 
         public void Dispose()
