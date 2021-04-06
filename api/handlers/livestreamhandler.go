@@ -1,10 +1,12 @@
 package handlers
 
 import (
+	"context"
 	"encoding/json"
 	"fmt"
 	"log"
 	"net/http"
+	"time"
 
 	"github.com/gorilla/mux"
 
@@ -22,22 +24,25 @@ func NewLiveStreamHandler(liveURL string, key string) *LiveStreamHandler {
 }
 
 // GetFixtures - Gets the fixtures for the given sport and date range
-func (handler *LiveStreamHandler) GetFixtures(res http.ResponseWriter, req *http.Request) {
-	res.Header().Set("content-type", "application/json")
-	res.Header().Set("Access-Control-Allow-Origin", "*")
+func (handler *LiveStreamHandler) GetFixtures(w http.ResponseWriter, r *http.Request) {
+	w.Header().Set("content-type", "application/json")
+	w.Header().Set("Access-Control-Allow-Origin", "*")
 
-	if req.Method == http.MethodOptions {
+	if r.Method == http.MethodOptions {
 		return
 	}
 
-	vars := mux.Vars(req)
+	ctx, cancel := context.WithTimeout(context.Background(), 2*time.Second)
+	defer cancel()
+
+	vars := mux.Vars(r)
 	sportType := vars["sportType"]
 	fromDate := vars["fromDate"]
 	toDate := vars["toDate"]
 
 	url := fmt.Sprintf("%s/%s/%s/%s", handler.liveStreamURL, sportType, fromDate, toDate)
 	client := &http.Client{}
-	request, err := http.NewRequest(http.MethodGet, url, nil)
+	request, err := http.NewRequestWithContext(ctx, http.MethodGet, url, nil)
 	logErrors(err)
 
 	request.Header.Add("APIKey", handler.apiKey)
@@ -50,30 +55,33 @@ func (handler *LiveStreamHandler) GetFixtures(res http.ResponseWriter, req *http
 	logErrors(err)
 
 	if len(*fixtures) == 0 {
-		http.Error(res, http.StatusText(http.StatusNotFound), http.StatusNotFound)
+		http.Error(w, http.StatusText(http.StatusNotFound), http.StatusNotFound)
 	}
 
-	res.WriteHeader(http.StatusOK)
-	if err := json.NewEncoder(res).Encode(*fixtures); err != nil {
+	w.WriteHeader(http.StatusOK)
+	if err := json.NewEncoder(w).Encode(*fixtures); err != nil {
 		log.Fatalln(err)
 	}
 }
 
 // GetStreams gets the streams for the fixture
-func (handler *LiveStreamHandler) GetStreams(res http.ResponseWriter, req *http.Request) {
-	res.Header().Set("content-type", "application/json")
-	res.Header().Set("Access-Control-Allow-Origin", "*")
+func (handler *LiveStreamHandler) GetStreams(w http.ResponseWriter, r *http.Request) {
+	w.Header().Set("content-type", "application/json")
+	w.Header().Set("Access-Control-Allow-Origin", "*")
 
-	if req.Method == http.MethodOptions {
+	if r.Method == http.MethodOptions {
 		return
 	}
 
-	vars := mux.Vars(req)
+	ctx, cancel := context.WithTimeout(context.Background(), 2*time.Second)
+	defer cancel()
+
+	vars := mux.Vars(r)
 	timerID := vars["timerId"]
 
 	url := fmt.Sprintf("%s/%s", handler.liveStreamURL, timerID)
 	client := &http.Client{}
-	request, err := http.NewRequest(http.MethodGet, url, nil)
+	request, err := http.NewRequestWithContext(ctx, http.MethodGet, url, nil)
 	logErrors(err)
 
 	request.Header.Add("APIKey", handler.apiKey)
@@ -85,8 +93,8 @@ func (handler *LiveStreamHandler) GetStreams(res http.ResponseWriter, req *http.
 	err = json.NewDecoder(response.Body).Decode(streams)
 	logErrors(err)
 
-	res.WriteHeader(http.StatusOK)
-	if err := json.NewEncoder(res).Encode(*streams); err != nil {
+	w.WriteHeader(http.StatusOK)
+	if err := json.NewEncoder(w).Encode(*streams); err != nil {
 		log.Fatalln(err)
 	}
 }
