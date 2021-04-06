@@ -1,6 +1,6 @@
-﻿using LibVLCSharp.Shared;
 using System;
 using System.Collections.Generic;
+using LibVLCSharp.Shared;
 
 namespace BalStreamer2.Caster.VLC
 {
@@ -9,8 +9,6 @@ namespace BalStreamer2.Caster.VLC
         List<RendererItem> RendererItems { get; set; }
 
         void DiscoverChromecasts();
-
-        void DiscoverChromecasts(Action<object, RendererDiscovererItemAddedEventArgs> chromecastFound, Action<object, RendererDiscovererItemDeletedEventArgs> chromecastLost);
 
         bool StartCasting(Uri stream, RendererItem rendererItem);
 

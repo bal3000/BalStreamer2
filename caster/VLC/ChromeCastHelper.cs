@@ -1,6 +1,6 @@
-﻿using LibVLCSharp.Shared;
-using System;
+﻿using System;
 using System.Collections.Generic;
+using LibVLCSharp.Shared;
 
 namespace BalStreamer2.Caster.VLC
 {
@@ -9,7 +9,7 @@ namespace BalStreamer2.Caster.VLC
         private readonly LibVLC _libVLC;
         private readonly MediaPlayer _mediaPlayer;
 
-        public ChromeCastHelper(bool startDiscovery = false)
+        public ChromeCastHelper()
         {
             // Load native libvlc library
             Core.Initialize();
@@ -18,27 +18,15 @@ namespace BalStreamer2.Caster.VLC
 
             // Redirect log output to the console
             // _libVLC.Log += (sender, e) => Console.WriteLine($"[{e.Level}] {e.Module}:{e.Message}");
-
-            if (startDiscovery)
-                DiscoverChromecasts();
         }
 
         public List<RendererItem> RendererItems { get; set; } = new List<RendererItem>();
-        public event EventHandler<RendererDiscovererItemAddedEventArgs> ChromecastFound;
-        public event EventHandler<RendererDiscovererItemDeletedEventArgs> ChromecastLost;
 
         public void DiscoverChromecasts()
         {
             var rendererDiscoverer = new RendererDiscoverer(_libVLC);
             rendererDiscoverer.ItemAdded += RendererDiscoverer_ItemAdded;
             rendererDiscoverer.ItemDeleted += RendererDiscoverer_ItemDeleted;
-            rendererDiscoverer.Start();
-        }
-        public void DiscoverChromecasts(Action<object, RendererDiscovererItemAddedEventArgs> chromecastFound, Action<object, RendererDiscovererItemDeletedEventArgs> chromecastLost)
-        {
-            var rendererDiscoverer = new RendererDiscoverer(_libVLC);
-            rendererDiscoverer.ItemAdded += (sender, e) => chromecastFound(sender, e);
-            rendererDiscoverer.ItemDeleted += (sender, e) => chromecastLost(sender, e);
             rendererDiscoverer.Start();
         }
 
@@ -72,8 +60,6 @@ namespace BalStreamer2.Caster.VLC
                 Console.WriteLine("Can render audio");
 
             RendererItems.Add(e.RendererItem);
-
-            ChromecastFound?.Invoke(this, e);
         }
 
         protected void RendererDiscoverer_ItemDeleted(object sender, RendererDiscovererItemDeletedEventArgs e)
@@ -81,8 +67,6 @@ namespace BalStreamer2.Caster.VLC
             Console.WriteLine($"Chromecast {e.RendererItem.Name} of type {e.RendererItem.Type} cannot be found so removing");
 
             RendererItems.Remove(e.RendererItem);
-
-            ChromecastLost?.Invoke(this, e);
         }
 
         public void Dispose()
