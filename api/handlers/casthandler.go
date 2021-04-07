@@ -27,6 +27,11 @@ func NewCastHandler(rabbit infrastructure.RabbitMQ, en string) *CastHandler {
 func (handler *CastHandler) CastStream(res http.ResponseWriter, req *http.Request) {
 	res.Header().Set("Access-Control-Allow-Origin", "*")
 	res.Header().Set("content-type", "application/json")
+
+	if req.Method == http.MethodOptions {
+		return
+	}
+
 	castCommand := new(models.StreamToCast)
 
 	if err := json.NewDecoder(req.Body).Decode(castCommand); err != nil {
@@ -49,6 +54,11 @@ func (handler *CastHandler) CastStream(res http.ResponseWriter, req *http.Reques
 func (handler *CastHandler) StopStream(res http.ResponseWriter, req *http.Request) {
 	res.Header().Set("Access-Control-Allow-Origin", "*")
 	res.Header().Set("content-type", "application/json")
+
+	if req.Method == http.MethodOptions {
+		return
+	}
+
 	stopStreamCommand := new(models.StopPlayingStream)
 
 	if err := json.NewDecoder(req.Body).Decode(stopStreamCommand); err != nil {
