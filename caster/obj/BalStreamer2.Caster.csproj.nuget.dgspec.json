@@ -55,6 +55,18 @@
               "target": "Package",
               "version": "[6.2.1, )"
             },
+            "Serilog.AspNetCore": {
+              "target": "Package",
+              "version": "[4.1.0, )"
+            },
+            "Serilog.Sinks.Console": {
+              "target": "Package",
+              "version": "[3.1.1, )"
+            },
+            "Serilog.Sinks.File": {
+              "target": "Package",
+              "version": "[4.1.0, )"
+            },
             "VideoLAN.LibVLC.Windows": {
               "target": "Package",
               "version": "[3.0.12, )"
