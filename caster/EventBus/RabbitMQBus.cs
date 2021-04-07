@@ -1,11 +1,9 @@
 using System;
 using System.Text.Json;
-using System.Threading.Channels;
 using System.Threading.Tasks;
 using BalStreamer2.Caster.EventBus.Events;
 using BalStreamer2.Caster.VLC;
 using RabbitMQ.Client;
-using RabbitMQ.Client.Events;
 
 namespace BalStreamer2.Caster.EventBus
 {
@@ -42,7 +40,7 @@ namespace BalStreamer2.Caster.EventBus
                 body: body);
         }
 
-        public void StartConsumer(string routingkey, Func<StreamToChromecastEvent, Task> castEventReceived)
+        public void StartConsumer(string routingkey, Func<StreamToChromecastEvent, Task> castEventReceived, Func<StopPlayingStreamEvent, Task> stopEventReceived)
         {
             var queueName = _channel.QueueDeclare(durable: true).QueueName;
             _channel.QueueBind(queue: queueName,
@@ -51,11 +49,27 @@ namespace BalStreamer2.Caster.EventBus
 
             var consumer = new RabbitMQ.Client.Events.AsyncEventingBasicConsumer(_channel);
 
-            consumer.Received += async (sender, e) => {                
+            consumer.Received += async (sender, e) =>
+            {
                 using var body = new System.IO.MemoryStream(e.Body.ToArray());
-                if (e.BasicProperties.Type == "") {
-                    var eve = await JsonSerializer.DeserializeAsync<StreamToChromecastEvent>(body, new JsonSerializerOptions { PropertyNameCaseInsensitive = true });
-                    await castEventReceived(eve);
+                if (Enum.TryParse(e.BasicProperties.Type, out EventTypes msgType))
+                {
+                    if (msgType == EventTypes.PlayStreamEvent)
+                    {
+                        var eve = await JsonSerializer.DeserializeAsync<StreamToChromecastEvent>(
+                            body,
+                            new JsonSerializerOptions { PropertyNameCaseInsensitive = true }
+                        );
+                        await castEventReceived(eve);
+                    }
+                    else if (msgType == EventTypes.StopStreamEvent)
+                    {
+                        var eve = await JsonSerializer.DeserializeAsync<StopPlayingStreamEvent>(
+                            body,
+                            new JsonSerializerOptions { PropertyNameCaseInsensitive = true }
+                        );
+                        await stopEventReceived(eve);
+                    }
                 }
             };
 
