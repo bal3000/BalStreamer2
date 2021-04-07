@@ -2,74 +2,66 @@ package handlers
 
 import (
 	"encoding/json"
-	"fmt"
 	"log"
 	"net/http"
+	"time"
 
 	"github.com/bal3000/BalStreamer2/api/infrastructure"
 	"github.com/bal3000/BalStreamer2/api/models"
 )
 
+const routingKey string = "chromecast-key"
+
 // CastHandler - controller for casting to chromecast
 type CastHandler struct {
-	Caster infrastructure.Caster
+	RabbitMQ     infrastructure.RabbitMQ
+	ExchangeName string
 }
 
 // NewCastHandler - constructor to return new controller while passing in dependencies
-func NewCastHandler(caster infrastructure.Caster) *CastHandler {
-	return &CastHandler{Caster: caster}
+func NewCastHandler(rabbit infrastructure.RabbitMQ, en string) *CastHandler {
+	return &CastHandler{RabbitMQ: rabbit, ExchangeName: en}
 }
 
 // CastStream - streams given data to given chromecast
 func (handler *CastHandler) CastStream(res http.ResponseWriter, req *http.Request) {
-	res.Header().Set("content-type", "application/json")
 	res.Header().Set("Access-Control-Allow-Origin", "*")
-
-	if req.Method == http.MethodOptions {
-		return
-	}
-
+	res.Header().Set("content-type", "application/json")
 	castCommand := new(models.StreamToCast)
 
 	if err := json.NewDecoder(req.Body).Decode(castCommand); err != nil {
 		log.Println(err)
 	}
 
-	// send to caster here via grpc
-	response, err := handler.Caster.CastStreamToChromecast(castCommand.Chromecast, castCommand.StreamURL)
-	if err != nil {
-		log.Fatalf("failed to send stream to chromecast, %v", err)
+	// Send to chromecast
+	cast := &models.StreamToChromecastEvent{
+		ChromeCastToStream: castCommand.Chromecast,
+		Stream:             castCommand.StreamURL,
+		StreamDate:         time.Now(),
 	}
-	log.Println("response Success")
 
-	if response.Success {
-		res.WriteHeader(http.StatusNoContent)
-	} else {
-		res.WriteHeader(http.StatusBadRequest)
-		res.Write([]byte(fmt.Sprintf("There was a problem sending the stream to chromecast %s, please try again later", castCommand.Chromecast)))
-	}
+	go handler.RabbitMQ.SendMessage(routingKey, cast)
+
+	res.WriteHeader(http.StatusNoContent)
 }
 
 // StopStream endpoint sends the command to stop the stream on the given chromecast
 func (handler *CastHandler) StopStream(res http.ResponseWriter, req *http.Request) {
-	res.Header().Set("content-type", "application/json")
 	res.Header().Set("Access-Control-Allow-Origin", "*")
-
-	if req.Method == http.MethodOptions {
-		return
-	}
-
+	res.Header().Set("content-type", "application/json")
 	stopStreamCommand := new(models.StopPlayingStream)
 
 	if err := json.NewDecoder(req.Body).Decode(stopStreamCommand); err != nil {
 		log.Println(err)
 	}
 
-	// send to caster here via grpc
-	err := handler.Caster.StopStream(stopStreamCommand.ChromeCastToStop)
-	if err != nil {
-		log.Fatalf("failed to send stream to chromecast, %v", err)
+	// Send to chromecast
+	cast := &models.StopPlayingStreamEvent{
+		ChromeCastToStop: stopStreamCommand.ChromeCastToStop,
+		StopDateTime:     stopStreamCommand.StopDateTime,
 	}
+
+	go handler.RabbitMQ.SendMessage(routingKey, cast)
 
 	res.WriteHeader(http.StatusAccepted)
 }

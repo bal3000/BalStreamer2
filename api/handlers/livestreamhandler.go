@@ -32,7 +32,7 @@ func (handler *LiveStreamHandler) GetFixtures(w http.ResponseWriter, r *http.Req
 		return
 	}
 
-	ctx, cancel := context.WithTimeout(context.Background(), 2*time.Second)
+	ctx, cancel := context.WithTimeout(r.Context(), 2*time.Second)
 	defer cancel()
 
 	vars := mux.Vars(r)
@@ -73,7 +73,7 @@ func (handler *LiveStreamHandler) GetStreams(w http.ResponseWriter, r *http.Requ
 		return
 	}
 
-	ctx, cancel := context.WithTimeout(context.Background(), 2*time.Second)
+	ctx, cancel := context.WithTimeout(r.Context(), 2*time.Second)
 	defer cancel()
 
 	vars := mux.Vars(r)

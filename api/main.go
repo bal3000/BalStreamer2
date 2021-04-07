@@ -2,7 +2,6 @@ package main
 
 import (
 	"fmt"
-	"log"
 	"os"
 
 	"github.com/bal3000/BalStreamer2/api/app"
@@ -24,20 +23,16 @@ func main() {
 }
 
 func run() error {
+	//setup rabbit
+	rabbit, err := infrastructure.NewRabbitMQConnection(&config)
+	if err != nil {
+		return err
+	}
+	defer rabbit.CloseChannel()
+
 	// set up g mux router
 	r := mux.NewRouter()
 
-	// setup grpc client
-	caster, err := infrastructure.NewCasterConnection(config.CasterURL)
-	if err != nil {
-		log.Fatalf("failed to connect to caster: %v", err)
-	}
-	defer func() {
-		if err := caster.CloseConnection(); err != nil {
-			log.Fatalf("failed to close connection to caster: %v", err)
-		}
-	}()
-
-	server := app.NewServer(r, caster, config)
+	server := app.NewServer(rabbit, r, config)
 	return server.Run()
 }

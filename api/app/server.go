@@ -13,13 +13,13 @@ import (
 )
 
 type Server struct {
-	Router *mux.Router
-	Caster infrastructure.Caster
-	Config infrastructure.Configuration
+	RabbitMQ infrastructure.RabbitMQ
+	Router   *mux.Router
+	Config   infrastructure.Configuration
 }
 
-func NewServer(r *mux.Router, c infrastructure.Caster, config infrastructure.Configuration) *Server {
-	return &Server{Router: r, Caster: c, Config: config}
+func NewServer(rabbit infrastructure.RabbitMQ, r *mux.Router, config infrastructure.Configuration) *Server {
+	return &Server{RabbitMQ: rabbit, Router: r, Config: config}
 }
 
 func (s *Server) Run() error {
@@ -37,10 +37,9 @@ func (s *Server) Run() error {
 	}
 
 	// Start server
-
-	log.Println("Started Server on port 8080")
 	// Run our server in a goroutine so that it doesn't block.
 	go func() {
+		log.Println("Started Server on port 8080")
 		if err := srv.ListenAndServe(); err != nil {
 			log.Println(err)
 		}

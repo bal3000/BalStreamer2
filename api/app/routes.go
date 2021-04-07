@@ -10,8 +10,8 @@ import (
 // SetRoutes creates the handlers and routes for those handlers
 func (s *Server) SetRoutes() {
 	// Handlers
-	cast := handlers.NewCastHandler(s.Caster)
-	chrome := handlers.NewChromecastHandler(s.Caster)
+	cast := handlers.NewCastHandler(s.RabbitMQ, s.Config.ExchangeName)
+	chrome := handlers.NewChromecastHandler(s.RabbitMQ, s.Config.QueueName)
 	live := handlers.NewLiveStreamHandler(s.Config.LiveStreamURL, s.Config.APIKey)
 
 	CastRoutes(s.Router, cast)
@@ -24,8 +24,8 @@ func (s *Server) SetRoutes() {
 // CastRoutes sets up the routes for the cast handler
 func CastRoutes(r *mux.Router, cast *handlers.CastHandler) {
 	s := r.PathPrefix("/api/cast").Subrouter()
-	s.HandleFunc("", cast.CastStream).Methods(http.MethodPost, http.MethodOptions)
-	s.HandleFunc("", cast.StopStream).Methods(http.MethodDelete, http.MethodOptions)
+	s.HandleFunc("", cast.CastStream).Methods(http.MethodPost)
+	s.HandleFunc("", cast.StopStream).Methods(http.MethodDelete)
 }
 
 // ChromecastRoutes sets up the routes for the chromecast handler

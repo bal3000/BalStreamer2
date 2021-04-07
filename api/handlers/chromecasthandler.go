@@ -1,28 +1,34 @@
 package handlers
 
 import (
+	"encoding/json"
+	"fmt"
 	"log"
 	"net/http"
 
 	"github.com/bal3000/BalStreamer2/api/infrastructure"
 	"github.com/bal3000/BalStreamer2/api/models"
 	"github.com/gorilla/websocket"
+	"github.com/streadway/amqp"
 )
 
 var (
-	upgrader           = websocket.Upgrader{}
-	chromecasts        = make(map[string]models.ChromecastEvent)
-	handledChromecasts = make(chan models.ChromecastEvent)
+	upgrader       = websocket.Upgrader{}
+	foundEventType = "ChromecastFoundEvent"
+	lostEventType  = "ChromecastLostEvent"
+	chromecasts    = make(map[string]models.ChromecastEvent)
+	handledMsgs    = make(chan models.ChromecastEvent)
 )
 
 // ChromecastHandler the controller for the websockets
 type ChromecastHandler struct {
-	Caster infrastructure.Caster
+	RabbitMQ  infrastructure.RabbitMQ
+	QueueName string
 }
 
 // NewChromecastHandler creates a new ref to chromecast controller
-func NewChromecastHandler(caster infrastructure.Caster) *ChromecastHandler {
-	return &ChromecastHandler{Caster: caster}
+func NewChromecastHandler(rabbit infrastructure.RabbitMQ, qn string) *ChromecastHandler {
+	return &ChromecastHandler{RabbitMQ: rabbit, QueueName: qn}
 }
 
 // ChromecastUpdates broadcasts a chromecast to all clients once found
@@ -36,31 +42,50 @@ func (handler *ChromecastHandler) ChromecastUpdates(res http.ResponseWriter, req
 	}
 	defer ws.Close()
 
-	// get from caster via grpc
-	go handler.Caster.FindChromecasts(handleChromecastEvent)
+	// send all chromecasts from last refresh to page
 
-	for cast := range handledChromecasts {
-		log.Printf("sending chromecast %s with status %v", cast.Name, cast.Lost)
-		err = ws.WriteJSON(cast)
+	log.Printf("Current chromecasts, %v", len(chromecasts))
+	for _, event := range chromecasts {
+		log.Printf("sending chromecast, %s", event)
+		err = ws.WriteJSON(event)
 		if err != nil {
 			log.Fatalln(err)
 		}
 	}
-	close(handledChromecasts)
+
+	err = handler.RabbitMQ.StartConsumer("chromecast-key", processMsgs, 2)
+	if err != nil {
+		panic(err)
+	}
+
+	for msg := range handledMsgs {
+		err = ws.WriteJSON(msg)
+		if err != nil {
+			log.Fatalln(err)
+		}
+	}
+	close(handledMsgs)
 }
 
-func handleChromecastEvent(name string, lost bool) {
-	log.Printf("handling chromecast %s with status %v", name, lost)
-	chromecast := models.ChromecastEvent{
-		Name: name,
-		Lost: lost,
+func processMsgs(d amqp.Delivery) bool {
+	fmt.Printf("processing message: %s, with type: %s", string(d.Body), d.Type)
+	event := new(models.ChromecastEvent)
+
+	// convert mass transit message
+	err := json.Unmarshal(d.Body, event)
+	if err != nil {
+		log.Println(err)
+		return false
 	}
 
-	if chromecast.Lost {
-		delete(chromecasts, chromecast.Name)
-	} else {
-		chromecasts[chromecast.Name] = chromecast
+	switch d.Type {
+	case foundEventType:
+		chromecasts[event.Chromecast] = *event
+	case lostEventType:
+		delete(chromecasts, event.Chromecast)
 	}
 
-	handledChromecasts <- chromecast
+	handledMsgs <- *event
+
+	return true
 }
