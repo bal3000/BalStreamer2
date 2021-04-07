@@ -43,15 +43,7 @@ func (handler *ChromecastHandler) ChromecastUpdates(res http.ResponseWriter, req
 	defer ws.Close()
 
 	// send all chromecasts from last refresh to page
-
-	log.Printf("Current chromecasts, %v", len(chromecasts))
-	for _, event := range chromecasts {
-		log.Printf("sending chromecast, %s", event)
-		err = ws.WriteJSON(event)
-		if err != nil {
-			log.Fatalln(err)
-		}
-	}
+	go handler.RabbitMQ.SendMessage(routingKey, &models.GetLatestChromecastEvent{})
 
 	err = handler.RabbitMQ.StartConsumer("chromecast-key", processMsgs, 2)
 	if err != nil {

@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text.Json;
 using System.Threading;
 using System.Threading.Tasks;
 using BalStreamer2.Caster.EventBus;
@@ -38,27 +39,7 @@ namespace BalStreamer2.Caster
         protected override async Task ExecuteAsync(CancellationToken stoppingToken)
         {
             // Start consuming rabbit cast events
-            Func<StreamToChromecastEvent, Task> castEvent = async (eve) =>
-            {
-                // revisit this
-                await Task.Run(() =>
-                {
-                    var item = _castHelper.RendererItems.Where(x => x.Name == eve.Chromecast).FirstOrDefault();
-                    if (item != null)
-                        _castHelper.StartCasting(new Uri(eve.StreamURL), item);
-                    else
-                        _logger.LogError("Chromecast not found for given cast event");
-                });
-            };
-
-            Func<StopPlayingStreamEvent, Task> stopEvent = async (eve) =>
-            {
-                // revisit this
-                _logger.LogError($"Stopping cast at {eve.StopDateTime.ToString("yyyy-MM-dd hh:mm")}");
-                await Task.Run(() => _castHelper.StopCasting());
-            };
-
-            _rabbitMQ.StartConsumer(routingKey, castEvent, stopEvent);
+            ListenForEvents();
 
             while (!stoppingToken.IsCancellationRequested)
             {
@@ -92,6 +73,46 @@ namespace BalStreamer2.Caster
                 CurrentChromecasts.Remove(item);
                 _rabbitMQ.SendMessage<ChromecastLostEvent>(new ChromecastLostEvent { Chromecast = item }, routingKey);
             }
+        }
+
+        private void ListenForEvents()
+        {
+            _rabbitMQ.StartConsumer(routingKey, async (e) =>
+            {
+                if (Enum.TryParse(e.BasicProperties.Type, out EventTypes msgType))
+                {
+                    if (msgType == EventTypes.PlayStreamEvent)
+                    {
+                        var eve = await DeserializeEventAsync<StreamToChromecastEvent>(e.Body.ToArray());
+                        var item = _castHelper.RendererItems.Where(x => x.Name == eve.Chromecast).FirstOrDefault();
+                        if (item != null)
+                            _castHelper.StartCasting(new Uri(eve.StreamURL), item);
+                        else
+                            _logger.LogError("Chromecast not found for given cast event");
+                    }
+                    else if (msgType == EventTypes.StopStreamEvent)
+                    {
+                        var eve = await DeserializeEventAsync<StopPlayingStreamEvent>(e.Body.ToArray());
+                        _logger.LogError($"Stopping cast at {eve.StopDateTime.ToString("yyyy-MM-dd hh:mm")}");
+                        await Task.Run(() => _castHelper.StopCasting());
+                    }
+                    else if (msgType == EventTypes.ChromecastLatestEvent)
+                    {
+                        foreach (var item in _castHelper.RendererItems)
+                        {
+                            _logger.LogInformation($"Found chromecast {item.Name}");
+                            CurrentChromecasts.Add(item.Name);
+                            _rabbitMQ.SendMessage<ChromecastFoundEvent>(new ChromecastFoundEvent { Chromecast = item.Name }, routingKey);
+                        }
+                    }
+                }
+            });
+        }
+
+        private async Task<T> DeserializeEventAsync<T>(byte[] body)
+        {
+            using var msg = new System.IO.MemoryStream(body.ToArray());
+            return await JsonSerializer.DeserializeAsync<T>(msg, new JsonSerializerOptions { PropertyNameCaseInsensitive = true });
         }
     }
 }

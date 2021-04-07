@@ -4,6 +4,7 @@ namespace BalStreamer2.Caster.EventBus.Events
     {
         PlayStreamEvent,
         StopStreamEvent,
+        ChromecastLatestEvent,
         ChromecastFoundEvent,
         ChromecastLostEvent,
     }

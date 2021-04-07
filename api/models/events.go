@@ -23,6 +23,8 @@ type StopPlayingStreamEvent struct {
 	StopDateTime     time.Time `json:"stopDateTime"`
 }
 
+type GetLatestChromecastEvent struct{}
+
 // ChromecastEvent event when a chromecast is found
 type ChromecastEvent struct {
 	Chromecast  string `json:"chromecast"`
@@ -45,4 +47,13 @@ func (message *StopPlayingStreamEvent) TransformMessage() ([]byte, string, error
 		return nil, "", err
 	}
 	return data, "StopPlayingStreamEvent", nil
+}
+
+// TransformMessage transforms the message to a masstransit one and then turns into JSON
+func (message *GetLatestChromecastEvent) TransformMessage() ([]byte, string, error) {
+	data, err := json.Marshal(message)
+	if err != nil {
+		return nil, "", err
+	}
+	return data, "ChromecastLatestEvent", nil
 }
