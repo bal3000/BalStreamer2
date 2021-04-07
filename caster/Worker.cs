@@ -80,6 +80,7 @@ namespace BalStreamer2.Caster
             // Not found before, adding
             foreach (var item in foundChromecasts)
             {
+                _logger.LogInformation($"Found chromecast {item.Name}");
                 CurrentChromecasts.Add(item.Name);
                 _rabbitMQ.SendMessage<ChromecastFoundEvent>(new ChromecastFoundEvent { Chromecast = item.Name }, routingKey);
             }
@@ -87,6 +88,7 @@ namespace BalStreamer2.Caster
             // found before, not there anymore, removing
             foreach (var item in lostChromecasts)
             {
+                _logger.LogInformation($"Lost chromecast {item}");
                 CurrentChromecasts.Remove(item);
                 _rabbitMQ.SendMessage<ChromecastLostEvent>(new ChromecastLostEvent { Chromecast = item }, routingKey);
             }

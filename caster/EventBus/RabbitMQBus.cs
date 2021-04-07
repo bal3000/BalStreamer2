@@ -3,6 +3,7 @@ using System.Text.Json;
 using System.Threading.Tasks;
 using BalStreamer2.Caster.EventBus.Events;
 using BalStreamer2.Caster.VLC;
+using Microsoft.Extensions.Logging;
 using RabbitMQ.Client;
 
 namespace BalStreamer2.Caster.EventBus
@@ -13,11 +14,12 @@ namespace BalStreamer2.Caster.EventBus
         private readonly IConnection _connection;
         private readonly IModel _channel;
         private readonly IChromeCastHelper _chromeCastHelper;
+        private readonly ILogger<RabbitMQBus> _logger;
 
-        public RabbitMQBus(IChromeCastHelper chromeCastHelper)
+        public RabbitMQBus(IChromeCastHelper chromeCastHelper, ILogger<RabbitMQBus> logger)
         {
             _chromeCastHelper = chromeCastHelper;
-
+            _logger = logger;
             var factory = new ConnectionFactory { HostName = "localhost" };
             _connection = factory.CreateConnection();
             _channel = _connection.CreateModel();
@@ -78,6 +80,7 @@ namespace BalStreamer2.Caster.EventBus
 
         public void Dispose()
         {
+            _logger.LogInformation($"Stopping rabbit connection and disposing resources");
             _channel.Close();
             _connection.Close();
             _channel.Dispose();
