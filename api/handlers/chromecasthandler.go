@@ -17,7 +17,6 @@ var (
 	foundEventType  = "ChromecastFoundEvent"
 	lostEventType   = "ChromecastLostEvent"
 	latestEventType = "ChromecastLatestEvent"
-	chromecasts     = make(map[string]models.ChromecastEvent)
 	handledMsgs     = make(chan models.ChromecastEvent)
 )
 
@@ -39,13 +38,15 @@ func (handler *ChromecastHandler) ChromecastUpdates(res http.ResponseWriter, req
 	upgrader.CheckOrigin = func(r *http.Request) bool { return true }
 	ws, err := upgrader.Upgrade(res, req, nil)
 	if err != nil {
-		log.Fatalln(err)
+		log.Print("Error during connection:", err)
+		return
 	}
 	defer ws.Close()
 
 	err = handler.RabbitMQ.StartConsumer("chromecast-key", processMsgs, 2)
 	if err != nil {
-		panic(err)
+		log.Print("Error consuming rabbit messages:", err)
+		return
 	}
 
 	// send all chromecasts from last refresh to page
@@ -55,7 +56,7 @@ func (handler *ChromecastHandler) ChromecastUpdates(res http.ResponseWriter, req
 		if msg.MessageType != latestEventType {
 			err = ws.WriteJSON(msg)
 			if err != nil {
-				log.Fatalln(err)
+				log.Println(err)
 			}
 		}
 	}
@@ -71,13 +72,6 @@ func processMsgs(d amqp.Delivery) bool {
 	if err != nil {
 		log.Println(err)
 		return false
-	}
-
-	switch d.Type {
-	case foundEventType:
-		chromecasts[event.Chromecast] = *event
-	case lostEventType:
-		delete(chromecasts, event.Chromecast)
 	}
 
 	handledMsgs <- *event

@@ -43,24 +43,33 @@ func (handler *LiveStreamHandler) GetFixtures(w http.ResponseWriter, r *http.Req
 	url := fmt.Sprintf("%s/%s/%s/%s", handler.liveStreamURL, sportType, fromDate, toDate)
 	client := &http.Client{}
 	request, err := http.NewRequestWithContext(ctx, http.MethodGet, url, nil)
-	logErrors(err)
+	if err != nil {
+		log.Printf("Failed to create request, %v", err)
+	}
 
 	request.Header.Add("APIKey", handler.apiKey)
 	response, err := client.Do(request)
-	logErrors(err)
+	if err != nil {
+		log.Printf("Failed to get fixtures, %v", err)
+	}
 	defer response.Body.Close()
 
 	fixtures := &[]models.LiveFixtures{}
 	err = json.NewDecoder(response.Body).Decode(fixtures)
-	logErrors(err)
+	if err != nil {
+		log.Printf("Failed to convert fixtures json, %v", err)
+	}
+
+	// log.Printf("fixtures found: %v", *fixtures)
 
 	if len(*fixtures) == 0 {
 		http.Error(w, http.StatusText(http.StatusNotFound), http.StatusNotFound)
+		return
 	}
 
 	w.WriteHeader(http.StatusOK)
 	if err := json.NewEncoder(w).Encode(*fixtures); err != nil {
-		log.Fatalln(err)
+		log.Printf("Failed to send json back to client, %v", err)
 	}
 }
 
@@ -82,25 +91,25 @@ func (handler *LiveStreamHandler) GetStreams(w http.ResponseWriter, r *http.Requ
 	url := fmt.Sprintf("%s/%s", handler.liveStreamURL, timerID)
 	client := &http.Client{}
 	request, err := http.NewRequestWithContext(ctx, http.MethodGet, url, nil)
-	logErrors(err)
+	if err != nil {
+		log.Printf("Failed to create request, %v", err)
+	}
 
 	request.Header.Add("APIKey", handler.apiKey)
 	response, err := client.Do(request)
-	logErrors(err)
+	if err != nil {
+		log.Printf("Failed to get streams, %v", err)
+	}
 	defer response.Body.Close()
 
 	streams := &models.Streams{}
 	err = json.NewDecoder(response.Body).Decode(streams)
-	logErrors(err)
+	if err != nil {
+		log.Printf("Failed to convert streams json, %v", err)
+	}
 
 	w.WriteHeader(http.StatusOK)
 	if err := json.NewEncoder(w).Encode(*streams); err != nil {
-		log.Fatalln(err)
-	}
-}
-
-func logErrors(err error) {
-	if err != nil {
-		log.Fatalln(err)
+		log.Printf("Failed to send json back to client, %v", err)
 	}
 }
