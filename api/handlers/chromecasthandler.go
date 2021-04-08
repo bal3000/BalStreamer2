@@ -13,11 +13,12 @@ import (
 )
 
 var (
-	upgrader       = websocket.Upgrader{}
-	foundEventType = "ChromecastFoundEvent"
-	lostEventType  = "ChromecastLostEvent"
-	chromecasts    = make(map[string]models.ChromecastEvent)
-	handledMsgs    = make(chan models.ChromecastEvent)
+	upgrader        = websocket.Upgrader{}
+	foundEventType  = "ChromecastFoundEvent"
+	lostEventType   = "ChromecastLostEvent"
+	latestEventType = "ChromecastLatestEvent"
+	chromecasts     = make(map[string]models.ChromecastEvent)
+	handledMsgs     = make(chan models.ChromecastEvent)
 )
 
 // ChromecastHandler the controller for the websockets
@@ -48,12 +49,14 @@ func (handler *ChromecastHandler) ChromecastUpdates(res http.ResponseWriter, req
 	}
 
 	// send all chromecasts from last refresh to page
-	go handler.RabbitMQ.SendMessage(routingKey, &models.GetLatestChromecastEvent{})
+	go handler.RabbitMQ.SendMessage(routingKey, &models.GetLatestChromecastEvent{MessageType: latestEventType})
 
 	for msg := range handledMsgs {
-		err = ws.WriteJSON(msg)
-		if err != nil {
-			log.Fatalln(err)
+		if msg.MessageType != latestEventType {
+			err = ws.WriteJSON(msg)
+			if err != nil {
+				log.Fatalln(err)
+			}
 		}
 	}
 	close(handledMsgs)

@@ -16,7 +16,7 @@ namespace BalStreamer2.Caster
                 .MinimumLevel.Debug()
                 .MinimumLevel.Override("Microsoft", LogEventLevel.Warning)
                 .Enrich.FromLogContext()
-                .WriteTo.File(@"D:\BalStreamer2\logs\LogFile.txt", rollingInterval: RollingInterval.Day, retainedFileCountLimit: 3, rollOnFileSizeLimit: true)
+                .WriteTo.File(@"D:\DotNet\BalStreamer.Caster\Logs\LogFile.txt", rollingInterval: RollingInterval.Day, retainedFileCountLimit: 3, rollOnFileSizeLimit: true)
                 .WriteTo.Console()
                 .CreateLogger();
 

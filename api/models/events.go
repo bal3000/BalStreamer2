@@ -23,7 +23,9 @@ type StopPlayingStreamEvent struct {
 	StopDateTime     time.Time `json:"stopDateTime"`
 }
 
-type GetLatestChromecastEvent struct{}
+type GetLatestChromecastEvent struct {
+	MessageType string `json:"messageType"`
+}
 
 // ChromecastEvent event when a chromecast is found
 type ChromecastEvent struct {

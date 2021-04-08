@@ -79,6 +79,7 @@ namespace BalStreamer2.Caster
         {
             _rabbitMQ.StartConsumer(routingKey, async (e) =>
             {
+                _logger.LogInformation($"Message recieved with type {e.BasicProperties.Type}");
                 if (Enum.TryParse(e.BasicProperties.Type, out EventTypes msgType))
                 {
                     if (msgType == EventTypes.PlayStreamEvent)

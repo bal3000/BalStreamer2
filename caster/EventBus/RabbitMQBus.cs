@@ -50,7 +50,7 @@ namespace BalStreamer2.Caster.EventBus
                               exchange: _exchangeName,
                               routingKey: routingkey);
 
-            var consumer = new RabbitMQ.Client.Events.AsyncEventingBasicConsumer(_channel);
+            var consumer = new EventingBasicConsumer(_channel);
 
             consumer.Received += (sender, e) => eventReceived(e);
 
