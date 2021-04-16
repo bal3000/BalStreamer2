@@ -14,8 +14,6 @@ import (
 
 var (
 	upgrader        = websocket.Upgrader{}
-	foundEventType  = "ChromecastFoundEvent"
-	lostEventType   = "ChromecastLostEvent"
 	latestEventType = "ChromecastLatestEvent"
 	handledMsgs     = make(chan models.ChromecastEvent)
 )

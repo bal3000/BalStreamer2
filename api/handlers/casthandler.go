@@ -45,7 +45,7 @@ func (handler *CastHandler) CastStream(res http.ResponseWriter, req *http.Reques
 		StreamDate:         time.Now(),
 	}
 
-	go handler.RabbitMQ.SendMessage(routingKey, cast)
+	handler.RabbitMQ.SendMessage(routingKey, cast)
 
 	res.WriteHeader(http.StatusNoContent)
 }
@@ -71,7 +71,7 @@ func (handler *CastHandler) StopStream(res http.ResponseWriter, req *http.Reques
 		StopDateTime:     stopStreamCommand.StopDateTime,
 	}
 
-	go handler.RabbitMQ.SendMessage(routingKey, cast)
+	handler.RabbitMQ.SendMessage(routingKey, cast)
 
 	res.WriteHeader(http.StatusAccepted)
 }
