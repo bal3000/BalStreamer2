@@ -41,12 +41,14 @@ func NewRabbitMQConnection(config Configuration) (RabbitMQ, func(), error) {
 		return nil, nil, err
 	}
 	return &rabbitMQConnection{configuration: config, channel: ch}, func() {
+		log.Println("Closing rabbitMQ channel and connection")
 		if err := ch.Close(); err != nil {
 			log.Printf("Rabbit channel closed with error: %v", err)
 		}
 		if err := conn.Close(); err != nil {
 			log.Printf("Rabbit connection closed with error: %v", err)
 		}
+		log.Println("Closed rabbitMQ channel and connection")
 	}, nil
 }
 
