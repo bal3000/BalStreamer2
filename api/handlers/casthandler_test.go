@@ -36,9 +36,6 @@ func (m *RabbitChannelMock) StartConsumer(routingKey string, handler func(d amqp
 	return args.Error(0)
 }
 
-func (m *RabbitChannelMock) CloseChannel() {
-}
-
 func TestCastStream(t *testing.T) {
 	// Setup
 	rabbitMock := new(RabbitChannelMock)
