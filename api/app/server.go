@@ -18,11 +18,11 @@ type Server struct {
 	Config   infrastructure.Configuration
 }
 
-func NewServer(rabbit infrastructure.RabbitMQ, r *mux.Router, config infrastructure.Configuration) *Server {
-	return &Server{RabbitMQ: rabbit, Router: r, Config: config}
+func NewServer(rabbit infrastructure.RabbitMQ, r *mux.Router, config infrastructure.Configuration) Server {
+	return Server{RabbitMQ: rabbit, Router: r, Config: config}
 }
 
-func (s *Server) Run() error {
+func (s Server) Run() error {
 	// Routes
 	s.SetRoutes()
 

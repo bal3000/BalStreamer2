@@ -8,7 +8,7 @@ import (
 )
 
 // SetRoutes creates the handlers and routes for those handlers
-func (s *Server) SetRoutes() {
+func (s Server) SetRoutes() {
 	// Handlers
 	cast := handlers.NewCastHandler(s.RabbitMQ, s.Config.ExchangeName)
 	chrome := handlers.NewChromecastHandler(s.RabbitMQ, s.Config.QueueName)
