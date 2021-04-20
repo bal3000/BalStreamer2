@@ -24,11 +24,11 @@ func main() {
 
 func run() error {
 	//setup rabbit
-	rabbit, err := infrastructure.NewRabbitMQConnection(&config)
+	rabbit, closer, err := infrastructure.NewRabbitMQConnection(config)
 	if err != nil {
 		return err
 	}
-	defer rabbit.CloseChannel()
+	defer closer()
 
 	// set up g mux router
 	r := mux.NewRouter()

@@ -12,12 +12,11 @@ import (
 type RabbitMQ interface {
 	SendMessage(routingKey string, message models.EventMessage) error
 	StartConsumer(routingKey string, handler func(d amqp.Delivery) bool, concurrency int) error
-	CloseChannel()
 }
 
 // RabbitMQConnection - settings to create a connection
 type rabbitMQConnection struct {
-	configuration *Configuration
+	configuration Configuration
 	channel       *amqp.Channel
 }
 
@@ -31,21 +30,24 @@ func (err rabbitError) Error() string {
 }
 
 // NewRabbitMQConnection creates a new rabbit mq connection
-func NewRabbitMQConnection(config *Configuration) (RabbitMQ, error) {
+func NewRabbitMQConnection(config Configuration) (RabbitMQ, func(), error) {
 	conn, err := amqp.Dial(config.RabbitURL)
 	if err != nil {
-		return nil, err
+		return nil, nil, err
 	}
 
 	ch, err := conn.Channel()
 	if err != nil {
-		return nil, err
+		return nil, nil, err
 	}
-	return &rabbitMQConnection{configuration: config, channel: ch}, nil
-}
-
-func (mq *rabbitMQConnection) CloseChannel() {
-	mq.channel.Close()
+	return &rabbitMQConnection{configuration: config, channel: ch}, func() {
+		if err := ch.Close(); err != nil {
+			log.Printf("Rabbit channel closed with error: %v", err)
+		}
+		if err := conn.Close(); err != nil {
+			log.Printf("Rabbit connection closed with error: %v", err)
+		}
+	}, nil
 }
 
 // SendMessage sends the given message
