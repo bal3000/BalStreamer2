@@ -19,12 +19,12 @@ type CastHandler struct {
 }
 
 // NewCastHandler - constructor to return new controller while passing in dependencies
-func NewCastHandler(rabbit infrastructure.RabbitMQ, en string) *CastHandler {
-	return &CastHandler{RabbitMQ: rabbit, ExchangeName: en}
+func NewCastHandler(rabbit infrastructure.RabbitMQ, en string) CastHandler {
+	return CastHandler{RabbitMQ: rabbit, ExchangeName: en}
 }
 
 // CastStream - streams given data to given chromecast
-func (handler *CastHandler) CastStream(res http.ResponseWriter, req *http.Request) {
+func (handler CastHandler) CastStream(res http.ResponseWriter, req *http.Request) {
 	res.Header().Set("Access-Control-Allow-Origin", "*")
 	res.Header().Set("content-type", "application/json")
 
@@ -51,7 +51,7 @@ func (handler *CastHandler) CastStream(res http.ResponseWriter, req *http.Reques
 }
 
 // StopStream endpoint sends the command to stop the stream on the given chromecast
-func (handler *CastHandler) StopStream(res http.ResponseWriter, req *http.Request) {
+func (handler CastHandler) StopStream(res http.ResponseWriter, req *http.Request) {
 	res.Header().Set("Access-Control-Allow-Origin", "*")
 	res.Header().Set("content-type", "application/json")
 

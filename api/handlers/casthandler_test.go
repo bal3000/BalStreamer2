@@ -50,7 +50,7 @@ func TestCastStream(t *testing.T) {
 
 	req := httptest.NewRequest(http.MethodPost, "/", strings.NewReader(castJSON))
 	rec := httptest.NewRecorder()
-	castHandle := &CastHandler{RabbitMQ: rabbitMock, ExchangeName: config.ExchangeName}
+	castHandle := CastHandler{RabbitMQ: rabbitMock, ExchangeName: config.ExchangeName}
 	castHandle.CastStream(rec, req)
 	// Assertions
 	assert.Equal(t, http.StatusNoContent, rec.Code)

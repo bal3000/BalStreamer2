@@ -25,12 +25,12 @@ type ChromecastHandler struct {
 }
 
 // NewChromecastHandler creates a new ref to chromecast controller
-func NewChromecastHandler(rabbit infrastructure.RabbitMQ, qn string) *ChromecastHandler {
-	return &ChromecastHandler{RabbitMQ: rabbit, QueueName: qn}
+func NewChromecastHandler(rabbit infrastructure.RabbitMQ, qn string) ChromecastHandler {
+	return ChromecastHandler{RabbitMQ: rabbit, QueueName: qn}
 }
 
 // ChromecastUpdates broadcasts a chromecast to all clients once found
-func (handler *ChromecastHandler) ChromecastUpdates(res http.ResponseWriter, req *http.Request) {
+func (handler ChromecastHandler) ChromecastUpdates(res http.ResponseWriter, req *http.Request) {
 	log.Println("Entered ws, sending current found chromecasts")
 
 	upgrader.CheckOrigin = func(r *http.Request) bool { return true }

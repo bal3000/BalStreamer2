@@ -22,19 +22,19 @@ func (s Server) SetRoutes() {
 }
 
 // CastRoutes sets up the routes for the cast handler
-func CastRoutes(r *mux.Router, cast *handlers.CastHandler) {
+func CastRoutes(r *mux.Router, cast handlers.CastHandler) {
 	s := r.PathPrefix("/api/cast").Subrouter()
 	s.HandleFunc("", cast.CastStream).Methods(http.MethodPost, http.MethodOptions)
 	s.HandleFunc("", cast.StopStream).Methods(http.MethodDelete, http.MethodOptions)
 }
 
 // ChromecastRoutes sets up the routes for the chromecast handler
-func ChromecastRoutes(r *mux.Router, chrome *handlers.ChromecastHandler) {
+func ChromecastRoutes(r *mux.Router, chrome handlers.ChromecastHandler) {
 	r.HandleFunc("/chromecasts", chrome.ChromecastUpdates).Methods(http.MethodGet)
 }
 
 // LiveStreamRoutes sets up the routes for the live streams handler
-func LiveStreamRoutes(r *mux.Router, live *handlers.LiveStreamHandler) {
+func LiveStreamRoutes(r *mux.Router, live handlers.LiveStreamHandler) {
 	s := r.PathPrefix("/api/livestreams").Subrouter()
 	s.HandleFunc("/{sportType}/{fromDate}/{toDate}", live.GetFixtures).Methods(http.MethodGet, http.MethodOptions)
 	s.HandleFunc("/{timerId}", live.GetStreams).Methods(http.MethodGet, http.MethodOptions)

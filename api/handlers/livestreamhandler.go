@@ -19,12 +19,12 @@ type LiveStreamHandler struct {
 }
 
 // NewLiveStreamHandler - Creates a new instance of live stream handler
-func NewLiveStreamHandler(liveURL string, key string) *LiveStreamHandler {
-	return &LiveStreamHandler{liveStreamURL: liveURL, apiKey: key}
+func NewLiveStreamHandler(liveURL string, key string) LiveStreamHandler {
+	return LiveStreamHandler{liveStreamURL: liveURL, apiKey: key}
 }
 
 // GetFixtures - Gets the fixtures for the given sport and date range
-func (handler *LiveStreamHandler) GetFixtures(w http.ResponseWriter, r *http.Request) {
+func (handler LiveStreamHandler) GetFixtures(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("content-type", "application/json")
 	w.Header().Set("Access-Control-Allow-Origin", "*")
 
@@ -74,7 +74,7 @@ func (handler *LiveStreamHandler) GetFixtures(w http.ResponseWriter, r *http.Req
 }
 
 // GetStreams gets the streams for the fixture
-func (handler *LiveStreamHandler) GetStreams(w http.ResponseWriter, r *http.Request) {
+func (handler LiveStreamHandler) GetStreams(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("content-type", "application/json")
 	w.Header().Set("Access-Control-Allow-Origin", "*")
 
