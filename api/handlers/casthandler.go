@@ -45,7 +45,9 @@ func (handler CastHandler) CastStream(res http.ResponseWriter, req *http.Request
 		StreamDate:         time.Now(),
 	}
 
-	handler.RabbitMQ.SendMessage(routingKey, cast)
+	if err := handler.RabbitMQ.SendMessage(routingKey, cast); err != nil {
+		log.Fatalln(err)
+	}
 
 	res.WriteHeader(http.StatusNoContent)
 }
@@ -71,7 +73,9 @@ func (handler CastHandler) StopStream(res http.ResponseWriter, req *http.Request
 		StopDateTime:     stopStreamCommand.StopDateTime,
 	}
 
-	handler.RabbitMQ.SendMessage(routingKey, cast)
+	if err := handler.RabbitMQ.SendMessage(routingKey, cast); err != nil {
+		log.Fatalln(err)
+	}
 
 	res.WriteHeader(http.StatusAccepted)
 }

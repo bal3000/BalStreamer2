@@ -54,6 +54,10 @@ func NewRabbitMQConnection(config Configuration) (RabbitMQ, func(), error) {
 
 // SendMessage sends the given message
 func (mq *rabbitMQConnection) SendMessage(routingKey string, message models.EventMessage) error {
+	if mq == nil {
+		return rabbitError{message: "rabbitMQ connection cannot be nil"}
+	}
+
 	b, t, err := message.TransformMessage()
 	if err != nil {
 		return err
@@ -76,6 +80,10 @@ func (mq *rabbitMQConnection) SendMessage(routingKey string, message models.Even
 
 // StartConsumer - starts consuming messages from the given queue
 func (mq *rabbitMQConnection) StartConsumer(routingKey string, handler func(d amqp.Delivery) bool, concurrency int) error {
+	if mq == nil {
+		return rabbitError{message: "rabbitMQ connection cannot be nil"}
+	}
+
 	// create the queue if it doesn't already exist
 	_, err := mq.channel.QueueDeclare(mq.configuration.QueueName, true, false, false, false, nil)
 	if err != nil {
