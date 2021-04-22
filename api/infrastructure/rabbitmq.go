@@ -30,7 +30,7 @@ func (err rabbitError) Error() string {
 }
 
 // NewRabbitMQConnection creates a new rabbit mq connection
-func NewRabbitMQConnection(config Configuration) (RabbitMQ, func(), error) {
+func NewRabbitMQConnection(config Configuration) (*rabbitMQConnection, func(), error) {
 	conn, err := amqp.Dial(config.RabbitURL)
 	if err != nil {
 		return nil, nil, err
