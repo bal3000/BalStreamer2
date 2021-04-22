@@ -1,6 +1,7 @@
 package infrastructure
 
 import (
+	"errors"
 	"fmt"
 	"log"
 
@@ -55,7 +56,7 @@ func NewRabbitMQConnection(config Configuration) (*rabbitMQConnection, func(), e
 // SendMessage sends the given message
 func (mq *rabbitMQConnection) SendMessage(routingKey string, message models.EventMessage) error {
 	if mq == nil {
-		return rabbitError{message: "rabbitMQ connection cannot be nil"}
+		return errors.New("rabbitMQ connection cannot be nil")
 	}
 
 	b, t, err := message.TransformMessage()
@@ -81,7 +82,7 @@ func (mq *rabbitMQConnection) SendMessage(routingKey string, message models.Even
 // StartConsumer - starts consuming messages from the given queue
 func (mq *rabbitMQConnection) StartConsumer(routingKey string, handler func(d amqp.Delivery) bool, concurrency int) error {
 	if mq == nil {
-		return rabbitError{message: "rabbitMQ connection cannot be nil"}
+		return errors.New("rabbitMQ connection cannot be nil")
 	}
 
 	// create the queue if it doesn't already exist
@@ -139,10 +140,4 @@ func (mq *rabbitMQConnection) StartConsumer(routingKey string, handler func(d am
 func returnErr(err error, msg string) error {
 	re := rabbitError{message: msg, ogErr: err}
 	return re
-}
-
-func failOnError(err error, msg string) {
-	if err != nil {
-		log.Fatalf("%s: %s", msg, err)
-	}
 }
