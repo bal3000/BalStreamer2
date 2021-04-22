@@ -10,8 +10,8 @@ import (
 // SetRoutes creates the handlers and routes for those handlers
 func (s Server) SetRoutes() {
 	// Handlers
-	cast := handlers.NewCastHandler(s.RabbitMQ, s.Config.ExchangeName)
-	chrome := handlers.NewChromecastHandler(s.RabbitMQ, s.Config.QueueName)
+	cast := handlers.NewCastHandler(s.RabbitMQ)
+	chrome := handlers.NewChromecastHandler(s.RabbitMQ)
 	live := handlers.NewLiveStreamHandler(s.Config.LiveStreamURL, s.Config.APIKey)
 
 	CastRoutes(s.Router, cast)

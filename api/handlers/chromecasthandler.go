@@ -20,13 +20,12 @@ var (
 
 // ChromecastHandler the controller for the websockets
 type ChromecastHandler struct {
-	RabbitMQ  infrastructure.RabbitMQ
-	QueueName string
+	rabbitMQ infrastructure.RabbitMQ
 }
 
 // NewChromecastHandler creates a new ref to chromecast controller
-func NewChromecastHandler(rabbit infrastructure.RabbitMQ, qn string) ChromecastHandler {
-	return ChromecastHandler{RabbitMQ: rabbit, QueueName: qn}
+func NewChromecastHandler(rabbit infrastructure.RabbitMQ) ChromecastHandler {
+	return ChromecastHandler{rabbitMQ: rabbit}
 }
 
 // ChromecastUpdates broadcasts a chromecast to all clients once found
@@ -41,14 +40,14 @@ func (handler ChromecastHandler) ChromecastUpdates(res http.ResponseWriter, req 
 	}
 	defer ws.Close()
 
-	err = handler.RabbitMQ.StartConsumer("chromecast-key", processMsgs, 2)
+	err = handler.rabbitMQ.StartConsumer("chromecast-key", processMsgs, 2)
 	if err != nil {
 		log.Print("Error consuming rabbit messages:", err)
 		return
 	}
 
 	// send all chromecasts from last refresh to page
-	go handler.RabbitMQ.SendMessage(routingKey, &models.GetLatestChromecastEvent{MessageType: latestEventType})
+	go handler.rabbitMQ.SendMessage(routingKey, &models.GetLatestChromecastEvent{MessageType: latestEventType})
 
 	for msg := range handledMsgs {
 		if msg.MessageType != latestEventType {

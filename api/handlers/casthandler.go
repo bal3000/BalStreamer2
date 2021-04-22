@@ -14,13 +14,12 @@ const routingKey string = "chromecast-key"
 
 // CastHandler - controller for casting to chromecast
 type CastHandler struct {
-	RabbitMQ     infrastructure.RabbitMQ
-	ExchangeName string
+	rabbitMQ infrastructure.RabbitMQ
 }
 
 // NewCastHandler - constructor to return new controller while passing in dependencies
-func NewCastHandler(rabbit infrastructure.RabbitMQ, en string) CastHandler {
-	return CastHandler{RabbitMQ: rabbit, ExchangeName: en}
+func NewCastHandler(rabbit infrastructure.RabbitMQ) CastHandler {
+	return CastHandler{rabbitMQ: rabbit}
 }
 
 // CastStream - streams given data to given chromecast
@@ -45,7 +44,7 @@ func (handler CastHandler) CastStream(res http.ResponseWriter, req *http.Request
 		StreamDate:         time.Now(),
 	}
 
-	if err := handler.RabbitMQ.SendMessage(routingKey, cast); err != nil {
+	if err := handler.rabbitMQ.SendMessage(routingKey, cast); err != nil {
 		log.Fatalln(err)
 	}
 
@@ -73,7 +72,7 @@ func (handler CastHandler) StopStream(res http.ResponseWriter, req *http.Request
 		StopDateTime:     stopStreamCommand.StopDateTime,
 	}
 
-	if err := handler.RabbitMQ.SendMessage(routingKey, cast); err != nil {
+	if err := handler.rabbitMQ.SendMessage(routingKey, cast); err != nil {
 		log.Fatalln(err)
 	}
 

@@ -8,12 +8,12 @@ import (
 
 // ScheduleHandler is the handler struct for schedule endpoints
 type ScheduleHandler struct {
-	RabbitMQ infrastructure.RabbitMQ
+	rabbitMQ infrastructure.RabbitMQ
 }
 
 // NewScheduleHandler creates a new pointer to schedule
-func NewScheduleHandler(rabbit infrastructure.RabbitMQ) ScheduleHandler {
-	return ScheduleHandler{RabbitMQ: rabbit}
+func NewScheduleHandler(rabbitMQ infrastructure.RabbitMQ) ScheduleHandler {
+	return ScheduleHandler{rabbitMQ}
 }
 
 // AddEventToSchedule sends the event to the schedule app and logs a copy
