@@ -30,10 +30,7 @@ export class FixtureComponent implements OnInit {
       .select(LiveStreamingState.selectFixtureStreams)
       .pipe(map((fn) => fn(this.fixture.timerId)));
 
-    const startDate = new Date(this.fixture.utcStart);
-    const endDate = new Date(this.fixture.utcEnd);
-
-    if (this.fixture.timerId && startDate > new Date() && endDate < new Date()) {
+    if (this.fixture.timerId && this.fixture.stateName === 'running') {
       this.store.dispatch(new GetStreams(this.fixture.timerId));
     }
   }

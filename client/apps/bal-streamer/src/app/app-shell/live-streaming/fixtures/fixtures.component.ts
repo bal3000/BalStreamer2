@@ -29,7 +29,7 @@ export class FixturesComponent implements OnInit {
     const tomorrow = new Date();
     tomorrow.setDate(tomorrow.getDate() + 1);
 
-    this.store.dispatch(new PopulateFixtures(SportType.Soccer, now, tomorrow));
+    this.store.dispatch(new PopulateFixtures(SportType.All, now, tomorrow));
   }
 
   selectFixture(fixture: LiveFixture): void {
