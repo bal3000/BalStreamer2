@@ -1,5 +1,0 @@
-<h2>Selected: {{ (selectedFixture$ | async)?.title }}</h2>
-
-<div class="grid grid-cols-3 gap-2 place-content-center">
-    <client-fixture *ngFor="let fixture of fixtures$ | async as list" [fixture]="fixture"></client-fixture>
-</div>
