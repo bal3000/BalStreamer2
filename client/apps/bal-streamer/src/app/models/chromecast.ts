@@ -1,4 +1,4 @@
 export interface Chromecast {
-  name: string;
-  lost: boolean;
+  chromecast: string;
+  messageType: string;
 }
