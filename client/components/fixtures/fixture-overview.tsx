@@ -1,3 +1,5 @@
+import Link from 'next/link';
+
 import { LiveFixture } from '../../models/live-fixture';
 
 interface FixtureOverviewProps {
@@ -20,11 +22,9 @@ function FixtureOverview({ fixture }: FixtureOverviewProps) {
           <li>{fixture.utcStart}</li>
           <li>{fixture.utcEnd}</li>
         </ul>
-        {/* <button type="button" @onclick="StreamToChromecast" 
-                  class="btn btn-lg btn-block btn-outline-primary">Stream
-                  RTMP</button>
-              <button type="button" className="btn btn-lg btn-block btn-primary">More
-                  Streams</button> */}
+        <Link href={`/live-fixture/${fixture.timerId}`}>
+          <a className='btn btn-lg btn-block btn-primary'>Show</a>
+        </Link>
       </div>
     </div>
   );
