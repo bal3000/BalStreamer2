@@ -1,4 +1,5 @@
 import { GetServerSideProps } from 'next';
+import { useRouter } from 'next/router';
 import axios from 'axios';
 
 import { Streams } from '../../models/streams';
@@ -23,5 +24,16 @@ export const getServerSideProps: GetServerSideProps<LiveFixtureDetailsProps> =
 export default function LiveFixtureDetails({
   streams,
 }: LiveFixtureDetailsProps) {
+  const router = useRouter();
+
+  const castStream = async (streamUrl: string) => {
+    await axios.post('/api/cast', {
+      chromecast: 'STILL TO GET',
+      streamURL: streamUrl,
+    });
+
+    router.push('/');
+  };
+
   return <div></div>;
 }
