@@ -1,6 +1,35 @@
+import { useEffect } from 'react';
 import Link from 'next/link';
 
+import { useActions } from '../../hooks';
+import { ChromecastEventType } from '../../models/chromecast-event-types';
+import Chromecasts from '../chromecasts/chromecasts';
+import { Chromecast } from '../../models/chromecast';
+
 function Header() {
+  const { addChromecast, removeChromecast } = useActions();
+
+  useEffect(() => {
+    const socket = new WebSocket('ws://localhost:8080/chromecasts');
+
+    // Connection opened
+    socket.addEventListener('open', () => {
+      console.log('Connection opened');
+    });
+
+    // Listen for messages
+    socket.addEventListener('message', (event: MessageEvent<Chromecast>) => {
+      console.log(`Message recieved ${JSON.stringify(event.data)}`);
+      const { messageType } = event.data;
+      if (messageType === ChromecastEventType.ChromecastFoundEvent.toString()) {
+        addChromecast(event.data);
+      }
+      if (messageType === ChromecastEventType.ChromecastLostEvent.toString()) {
+        removeChromecast(event.data);
+      }
+    });
+  }, []);
+
   return (
     <>
       <header>
@@ -14,23 +43,7 @@ function Header() {
                 </p>
               </div>
               <div className='col-sm-4 offset-md-1 py-4'>
-                <ul className='list-unstyled'>
-                  <li>
-                    <a href='#' className='text-white'>
-                      Follow on Twitter
-                    </a>
-                  </li>
-                  <li>
-                    <a href='#' className='text-white'>
-                      Like on Facebook
-                    </a>
-                  </li>
-                  <li>
-                    <a href='#' className='text-white'>
-                      Email me
-                    </a>
-                  </li>
-                </ul>
+                <Chromecasts />
               </div>
             </div>
           </div>

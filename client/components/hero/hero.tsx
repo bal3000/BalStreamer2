@@ -1,5 +1,7 @@
 import Link from 'next/link';
 
+import Chromecasts from '../chromecasts/chromecasts';
+
 function Hero() {
   return (
     <div className='p-5 mb-4 bg-light rounded-3'>
@@ -9,6 +11,7 @@ function Hero() {
           Please select a chromecast below or in the top nav, before selecting a
           stream
         </p>
+        <Chromecasts />
         <Link href='/live-fixtures'>
           <button className='btn btn-primary btn-lg' type='button'>
             Show all fixtures
