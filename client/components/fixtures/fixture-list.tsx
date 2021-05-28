@@ -9,7 +9,7 @@ function FixtureList({ fixtures }: FixtureListProps) {
   return (
     <div className={'card-deck mb-3 text-center'}>
       {fixtures.map((fix) => (
-        <FixtureOverview fixture={fix} />
+        <FixtureOverview key={fix.timerId} fixture={fix} />
       ))}
     </div>
   );

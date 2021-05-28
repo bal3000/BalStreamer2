@@ -1,5 +1,5 @@
 import { GetServerSideProps } from 'next';
-import axios from 'axios';
+import streamerApi from '../helpers/api-caller';
 
 import FixtureList from '../components/fixtures/fixture-list';
 import { LiveFixture } from '../models/live-fixture';
@@ -10,8 +10,8 @@ interface HomeProps {
 
 export const getServerSideProps: GetServerSideProps<HomeProps> = async () => {
   const today = new Date().toISOString().split('T')[0];
-  const response = await axios.get<LiveFixture[]>(
-    `/api/livestreams/soccer/${today}/${today}`
+  const response = await streamerApi.get<LiveFixture[]>(
+    `/api/livestreams/all/${today}/${today}/inplay`
   );
 
   if (response.status !== 200) {
