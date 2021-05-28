@@ -8,18 +8,19 @@ import (
 	"os/signal"
 	"time"
 
+	"github.com/bal3000/BalStreamer2/api/eventbus"
 	"github.com/bal3000/BalStreamer2/api/infrastructure"
 	"github.com/gorilla/mux"
 )
 
 type Server struct {
-	RabbitMQ infrastructure.RabbitMQ
+	EventBus eventbus.EventBus
 	Router   *mux.Router
 	Config   infrastructure.Configuration
 }
 
-func NewServer(rabbit infrastructure.RabbitMQ, r *mux.Router, config infrastructure.Configuration) Server {
-	return Server{RabbitMQ: rabbit, Router: r, Config: config}
+func NewServer(eventbus eventbus.EventBus, r *mux.Router, config infrastructure.Configuration) Server {
+	return Server{EventBus: eventbus, Router: r, Config: config}
 }
 
 func (s Server) Run() error {

@@ -7,6 +7,7 @@ import (
 	"testing"
 	"time"
 
+	"github.com/bal3000/BalStreamer2/api/eventbus"
 	"github.com/bal3000/BalStreamer2/api/infrastructure"
 	"github.com/bal3000/BalStreamer2/api/models"
 	"github.com/streadway/amqp"
@@ -26,7 +27,7 @@ type RabbitChannelMock struct {
 	mock.Mock
 }
 
-func (m *RabbitChannelMock) SendMessage(routingKey string, message models.EventMessage) error {
+func (m *RabbitChannelMock) SendMessage(routingKey string, message eventbus.EventMessage) error {
 	args := m.Called(routingKey, message)
 	return args.Error(0)
 }
@@ -50,7 +51,7 @@ func TestCastStream(t *testing.T) {
 
 	req := httptest.NewRequest(http.MethodPost, "/", strings.NewReader(castJSON))
 	rec := httptest.NewRecorder()
-	castHandle := CastHandler{rabbitMQ: rabbitMock}
+	castHandle := CastHandler{eventbus: rabbitMock}
 	castHandle.CastStream(rec, req)
 	// Assertions
 	assert.Equal(t, http.StatusNoContent, rec.Code)

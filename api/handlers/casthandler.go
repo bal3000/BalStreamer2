@@ -6,7 +6,7 @@ import (
 	"net/http"
 	"time"
 
-	"github.com/bal3000/BalStreamer2/api/infrastructure"
+	"github.com/bal3000/BalStreamer2/api/eventbus"
 	"github.com/bal3000/BalStreamer2/api/models"
 )
 
@@ -14,12 +14,12 @@ const routingKey string = "chromecast-key"
 
 // CastHandler - controller for casting to chromecast
 type CastHandler struct {
-	rabbitMQ infrastructure.RabbitMQ
+	eventbus eventbus.EventBus
 }
 
 // NewCastHandler - constructor to return new controller while passing in dependencies
-func NewCastHandler(rabbit infrastructure.RabbitMQ) CastHandler {
-	return CastHandler{rabbitMQ: rabbit}
+func NewCastHandler(eventbus eventbus.EventBus) CastHandler {
+	return CastHandler{eventbus}
 }
 
 // CastStream - streams given data to given chromecast
@@ -44,7 +44,7 @@ func (handler CastHandler) CastStream(res http.ResponseWriter, req *http.Request
 		StreamDate:         time.Now(),
 	}
 
-	if err := handler.rabbitMQ.SendMessage(routingKey, cast); err != nil {
+	if err := handler.eventbus.SendMessage(routingKey, cast); err != nil {
 		log.Fatalln(err)
 	}
 
@@ -72,7 +72,7 @@ func (handler CastHandler) StopStream(res http.ResponseWriter, req *http.Request
 		StopDateTime:     stopStreamCommand.StopDateTime,
 	}
 
-	if err := handler.rabbitMQ.SendMessage(routingKey, cast); err != nil {
+	if err := handler.eventbus.SendMessage(routingKey, cast); err != nil {
 		log.Fatalln(err)
 	}
 

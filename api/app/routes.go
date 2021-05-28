@@ -3,6 +3,7 @@ package app
 import (
 	"net/http"
 
+	"github.com/bal3000/BalStreamer2/api/chromecast"
 	"github.com/bal3000/BalStreamer2/api/handlers"
 	"github.com/bal3000/BalStreamer2/api/livestream"
 	"github.com/gorilla/mux"
@@ -11,8 +12,8 @@ import (
 // SetRoutes creates the handlers and routes for those handlers
 func (s Server) SetRoutes() {
 	// Handlers
-	cast := handlers.NewCastHandler(s.RabbitMQ)
-	chrome := handlers.NewChromecastHandler(s.RabbitMQ)
+	cast := handlers.NewCastHandler(s.EventBus)
+	chrome := chromecast.NewChromecastHandler(s.EventBus)
 	live := livestream.NewLiveStreamHandler(s.Config.LiveStreamURL, s.Config.APIKey)
 
 	CastRoutes(s.Router, cast)
@@ -30,8 +31,8 @@ func CastRoutes(r *mux.Router, cast handlers.CastHandler) {
 }
 
 // ChromecastRoutes sets up the routes for the chromecast handler
-func ChromecastRoutes(r *mux.Router, chrome handlers.ChromecastHandler) {
-	r.HandleFunc("/chromecasts", chrome.ChromecastUpdates).Methods(http.MethodGet)
+func ChromecastRoutes(r *mux.Router, chrome chromecast.ChromecastHandler) {
+	r.HandleFunc("/chromecasts", chrome.GetChromecasts).Methods(http.MethodGet)
 }
 
 // LiveStreamRoutes sets up the routes for the live streams handler

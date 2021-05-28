@@ -5,6 +5,7 @@ import (
 	"os"
 
 	"github.com/bal3000/BalStreamer2/api/app"
+	"github.com/bal3000/BalStreamer2/api/eventbus"
 	"github.com/bal3000/BalStreamer2/api/infrastructure"
 	"github.com/gorilla/mux"
 )
@@ -24,11 +25,13 @@ func main() {
 
 func run() error {
 	//setup rabbit
-	rabbit, closer, err := infrastructure.NewRabbitMQConnection(config)
+	rabbit, closer, err := eventbus.NewRabbitMQConnection(config)
 	if err != nil {
 		return err
 	}
 	defer closer()
+
+	// TODO: Call the listener for chromecast events here and send the message to get the latest chromecasts on boot
 
 	// set up g mux router
 	r := mux.NewRouter()
