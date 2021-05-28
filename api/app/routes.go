@@ -4,6 +4,7 @@ import (
 	"net/http"
 
 	"github.com/bal3000/BalStreamer2/api/handlers"
+	"github.com/bal3000/BalStreamer2/api/livestream"
 	"github.com/gorilla/mux"
 )
 
@@ -12,11 +13,11 @@ func (s Server) SetRoutes() {
 	// Handlers
 	cast := handlers.NewCastHandler(s.RabbitMQ)
 	chrome := handlers.NewChromecastHandler(s.RabbitMQ)
-	live := handlers.NewLiveStreamHandler(s.Config.LiveStreamURL, s.Config.APIKey)
+	live := livestream.NewLiveStreamHandler(s.Config.LiveStreamURL, s.Config.APIKey)
 
 	CastRoutes(s.Router, cast)
 	ChromecastRoutes(s.Router, chrome)
-	LiveStreamRoutes(s.Router, live)
+	live.Routes(s.Router)
 
 	s.Router.PathPrefix("/").Handler(http.FileServer(http.Dir("public/")))
 }
