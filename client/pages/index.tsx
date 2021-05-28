@@ -1,6 +1,6 @@
 import { GetServerSideProps } from 'next';
-import streamerApi from '../helpers/api-caller';
 
+import streamerApi from '../helpers/api-caller';
 import FixtureList from '../components/fixtures/fixture-list';
 import { LiveFixture } from '../models/live-fixture';
 import Hero from '../components/hero/hero';
