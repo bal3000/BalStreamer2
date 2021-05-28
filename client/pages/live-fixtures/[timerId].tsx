@@ -1,7 +1,10 @@
 import { GetServerSideProps } from 'next';
 import { useRouter } from 'next/router';
-import streamerApi from '../../helpers/api-caller';
 
+import { useTypedSelector } from '../../hooks';
+import StreamOverview from '../../components/streams/stream-overview';
+import StreamDetails from '../../components/streams/stream-details';
+import streamerApi from '../../helpers/api-caller';
 import { Streams } from '../../models/streams';
 
 interface LiveFixtureDetailsProps {
@@ -25,15 +28,25 @@ export default function LiveFixtureDetails({
   streams,
 }: LiveFixtureDetailsProps) {
   const router = useRouter();
+  const fixture = useTypedSelector(({ fixture }) => fixture?.selectedFixture);
 
-  const castStream = async (streamUrl: string) => {
+  // TODO:  if null e.g. direct link, call api and re fetch data and set the selected fixture
+  if (!fixture) {
+  }
+
+  const castStream = async () => {
     await streamerApi.post('/api/cast', {
       chromecast: 'STILL TO GET',
-      streamURL: streamUrl,
+      streamURL: streams.rtmp,
     });
 
     router.push('/');
   };
 
-  return <div></div>;
+  return (
+    <>
+      {fixture && <StreamOverview fixture={fixture} />}
+      <StreamDetails cast={() => castStream()} />
+    </>
+  );
 }

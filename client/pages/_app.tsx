@@ -1,10 +1,12 @@
 import type { AppProps } from 'next/app';
 import Head from 'next/head';
+import { Provider } from 'react-redux';
+
+import { store } from '../state';
+import Header from '../components/header/header';
 
 import 'bootstrap/dist/css/bootstrap.css';
 import '../styles/globals.css';
-
-import Header from '../components/header/header';
 
 function MyApp({ Component, pageProps }: AppProps) {
   return (
@@ -16,7 +18,9 @@ function MyApp({ Component, pageProps }: AppProps) {
       <Header />
       <main role='main'>
         <div className='container'>
-          <Component {...pageProps} />
+          <Provider store={store}>
+            <Component {...pageProps} />
+          </Provider>
         </div>
       </main>
       <script

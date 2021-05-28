@@ -1,6 +1,8 @@
 import Link from 'next/link';
+import { useRouter } from 'next/router';
 
 import { LiveFixture } from '../../models/live-fixture';
+import { useActions } from '../../hooks';
 
 interface FixtureOverviewProps {
   index: number;
@@ -8,6 +10,9 @@ interface FixtureOverviewProps {
 }
 
 function FixtureOverview({ fixture, index }: FixtureOverviewProps) {
+  const router = useRouter();
+  const { selectFixture } = useActions();
+
   let containerClasses = 'h-100 p-5 text-white bg-dark rounded-3';
   let buttonClasses = 'btn btn-outline-light';
   if (index % 2 === 0) {
@@ -26,6 +31,11 @@ function FixtureOverview({ fixture, index }: FixtureOverviewProps) {
     })}`;
   };
 
+  const goToStreamPage = () => {
+    selectFixture(fixture);
+    router.push(`/live-fixtures/${fixture.timerId}`);
+  };
+
   return (
     <div className='col-md-6 p-2'>
       <div className={containerClasses}>
@@ -37,11 +47,13 @@ function FixtureOverview({ fixture, index }: FixtureOverviewProps) {
           <li suppressHydrationWarning>{formatDate(fixture.utcStart)}</li>
           <li suppressHydrationWarning>{formatDate(fixture.utcEnd)}</li>
         </ul>
-        <Link href={`/live-fixture/${fixture.timerId}`}>
-          <button className={buttonClasses} type='button'>
-            Show
-          </button>
-        </Link>
+        <button
+          className={buttonClasses}
+          type='button'
+          onClick={() => goToStreamPage()}
+        >
+          Get Streams
+        </button>
       </div>
     </div>
   );
