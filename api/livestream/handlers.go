@@ -77,7 +77,7 @@ func (handler LiveStreamHandler) GetLiveFixtures(w http.ResponseWriter, r *http.
 		log.Println(err)
 	}
 
-	liveFixtures := make([]LiveFixtures, len(*fixtures))
+	var liveFixtures = []LiveFixtures{}
 	for _, fixture := range *fixtures {
 		start := parseDate(fixture.UtcStart)
 		end := parseDate(fixture.UtcEnd)
