@@ -4,13 +4,26 @@ import Head from 'next/head';
 import 'bootstrap/dist/css/bootstrap.css';
 import '../styles/globals.css';
 
+import Header from '../components/header/header';
+
 function MyApp({ Component, pageProps }: AppProps) {
   return (
     <>
       <Head>
         <meta name='viewport' content='width=device-width, initial-scale=1' />
       </Head>
-      <Component {...pageProps} />
+
+      <Header />
+      <main role='main'>
+        <div className='container'>
+          <Component {...pageProps} />
+        </div>
+      </main>
+      <script
+        src='https://cdn.jsdelivr.net/npm/bootstrap@5.0.1/dist/js/bootstrap.min.js'
+        integrity='sha384-Atwg2Pkwv9vp0ygtn1JAojH0nYbwNJLPhwyoVbhoPwBhjQPR5VtM2+xf0Uwh9KtT'
+        crossOrigin='anonymous'
+      ></script>
     </>
   );
 }

@@ -3,6 +3,7 @@ import streamerApi from '../helpers/api-caller';
 
 import FixtureList from '../components/fixtures/fixture-list';
 import { LiveFixture } from '../models/live-fixture';
+import Hero from '../components/hero/hero';
 
 interface HomeProps {
   fixtures: LiveFixture[];
@@ -31,10 +32,9 @@ export const getServerSideProps: GetServerSideProps<HomeProps> = async () => {
 
 export default function Home({ fixtures }: HomeProps) {
   return (
-    <main role='main'>
-      <div className='container'>
-        <FixtureList fixtures={fixtures} />
-      </div>
-    </main>
+    <>
+      <Hero />
+      <FixtureList fixtures={fixtures} />
+    </>
   );
 }

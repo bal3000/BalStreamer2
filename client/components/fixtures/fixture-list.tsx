@@ -7,9 +7,9 @@ interface FixtureListProps {
 
 function FixtureList({ fixtures }: FixtureListProps) {
   return (
-    <div className={'card-deck mb-3 text-center'}>
-      {fixtures.map((fix) => (
-        <FixtureOverview key={fix.timerId} fixture={fix} />
+    <div className='row align-items-md-stretch'>
+      {fixtures.map((fix, index) => (
+        <FixtureOverview key={fix.timerId} fixture={fix} index={index + 1} />
       ))}
     </div>
   );
