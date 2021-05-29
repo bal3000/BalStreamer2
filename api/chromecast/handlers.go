@@ -13,15 +13,17 @@ type ChromecastHandler struct {
 	chromecasts map[string]bool
 }
 
-func NewChromecastHandler(eb eventbus.EventBus) (ChromecastHandler, error) {
+func NewChromecastHandler(eb eventbus.EventBus) ChromecastHandler {
 	// Start listening to events
 	listener := NewEventListener(eb)
-	err := listener.StartListening()
-	if err != nil {
-		return ChromecastHandler{}, err
-	}
+	go func() {
+		err := listener.StartListening()
+		if err != nil {
+			log.Fatalf("error listening to events: %v", err)
+		}
+	}()
 
-	return ChromecastHandler{eventbus: eb, chromecasts: listener.Chromecasts}, nil
+	return ChromecastHandler{eventbus: eb, chromecasts: listener.Chromecasts}
 }
 
 func (handler ChromecastHandler) GetChromecasts(w http.ResponseWriter, r *http.Request) {

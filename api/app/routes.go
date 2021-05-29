@@ -1,7 +1,6 @@
 package app
 
 import (
-	"log"
 	"net/http"
 
 	"github.com/bal3000/BalStreamer2/api/chromecast"
@@ -14,10 +13,7 @@ import (
 func (s Server) SetRoutes() {
 	// Handlers
 	cast := handlers.NewCastHandler(s.EventBus)
-	chrome, err := chromecast.NewChromecastHandler(s.EventBus)
-	if err != nil {
-		log.Fatalf("error setting up the chromecast handler: %v", err)
-	}
+	chrome := chromecast.NewChromecastHandler(s.EventBus)
 	chrome.Routes(s.Router)
 
 	live := livestream.NewLiveStreamHandler(s.Config.LiveStreamURL, s.Config.APIKey)

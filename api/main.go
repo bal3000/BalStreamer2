@@ -1,7 +1,6 @@
 package main
 
 import (
-	"context"
 	"fmt"
 	"os"
 
@@ -18,16 +17,13 @@ func init() {
 }
 
 func main() {
-	ctx, cancel := context.WithCancel(context.Background())
-	defer cancel()
-
-	if err := run(ctx); err != nil {
+	if err := run(); err != nil {
 		fmt.Fprintf(os.Stderr, "startup error: %s\n", err)
 		os.Exit(1)
 	}
 }
 
-func run(ctx context.Context) error {
+func run() error {
 	//setup rabbit
 	rabbit, closer, err := eventbus.NewRabbitMQConnection(config)
 	if err != nil {
