@@ -2,27 +2,26 @@ package chromecast
 
 import (
 	"encoding/json"
-	"fmt"
 	"log"
 	"net/http"
 
 	"github.com/bal3000/BalStreamer2/api/eventbus"
-	"github.com/streadway/amqp"
-)
-
-const routingKey string = "chromecast-key"
-
-var (
-	latestEventType = "ChromecastLatestEvent"
-	handledMsgs     = make(chan ChromecastEvent)
 )
 
 type ChromecastHandler struct {
-	eventbus eventbus.EventBus
+	eventbus    eventbus.EventBus
+	chromecasts map[string]bool
 }
 
-func NewChromecastHandler(eb eventbus.EventBus) ChromecastHandler {
-	return ChromecastHandler{eventbus: eb}
+func NewChromecastHandler(eb eventbus.EventBus) (ChromecastHandler, error) {
+	// Start listening to events
+	listener := NewEventListener(eb)
+	err := listener.StartListening()
+	if err != nil {
+		return ChromecastHandler{}, err
+	}
+
+	return ChromecastHandler{eventbus: eb, chromecasts: listener.Chromecasts}, nil
 }
 
 func (handler ChromecastHandler) GetChromecasts(w http.ResponseWriter, r *http.Request) {
@@ -33,37 +32,13 @@ func (handler ChromecastHandler) GetChromecasts(w http.ResponseWriter, r *http.R
 		return
 	}
 
-	err := handler.eventbus.StartConsumer("chromecast-key", processMsgs, 2)
-	if err != nil {
-		log.Print("Error consuming rabbit messages:", err)
+	if len(handler.chromecasts) == 0 {
+		http.NotFound(w, r)
 		return
 	}
 
-	// send all chromecasts from last refresh to page
-	go handler.eventbus.SendMessage(routingKey, &GetLatestChromecastEvent{MessageType: latestEventType})
-
-	var chromecasts = []ChromecastEvent{}
-
-	for msg := range handledMsgs {
-		if msg.MessageType != latestEventType {
-			chromecasts = append(chromecasts, msg)
-		}
+	w.WriteHeader(http.StatusOK)
+	if err := json.NewEncoder(w).Encode(handler.chromecasts); err != nil {
+		log.Printf("Failed to send json back to client, %v", err)
 	}
-	close(handledMsgs)
-}
-
-func processMsgs(d amqp.Delivery) bool {
-	fmt.Printf("processing message: %s, with type: %s", string(d.Body), d.Type)
-	event := new(ChromecastEvent)
-
-	// convert mass transit message
-	err := json.Unmarshal(d.Body, event)
-	if err != nil {
-		log.Println(err)
-		return false
-	}
-
-	handledMsgs <- *event
-
-	return true
 }

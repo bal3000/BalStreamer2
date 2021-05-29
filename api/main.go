@@ -1,6 +1,7 @@
 package main
 
 import (
+	"context"
 	"fmt"
 	"os"
 
@@ -17,21 +18,22 @@ func init() {
 }
 
 func main() {
-	if err := run(); err != nil {
+	ctx, cancel := context.WithCancel(context.Background())
+	defer cancel()
+
+	if err := run(ctx); err != nil {
 		fmt.Fprintf(os.Stderr, "startup error: %s\n", err)
 		os.Exit(1)
 	}
 }
 
-func run() error {
+func run(ctx context.Context) error {
 	//setup rabbit
 	rabbit, closer, err := eventbus.NewRabbitMQConnection(config)
 	if err != nil {
 		return err
 	}
 	defer closer()
-
-	// TODO: Call the listener for chromecast events here and send the message to get the latest chromecasts on boot
 
 	// set up g mux router
 	r := mux.NewRouter()
