@@ -11,23 +11,31 @@ interface HomeProps {
 
 export const getServerSideProps: GetServerSideProps<HomeProps> = async () => {
   const today = new Date().toISOString().split('T')[0];
-  const response = await streamerApi.get<LiveFixture[]>(
-    `/api/livestreams/all/${today}/${today}/inplay`
-  );
+  try {
+    const response = await streamerApi.get<LiveFixture[]>(
+      `/api/livestreams/all/${today}/${today}/inplay`
+    );
 
-  if (response.status !== 200) {
+    if (response.status !== 200) {
+      return {
+        props: {
+          fixtures: [],
+        },
+      };
+    }
+
+    return {
+      props: {
+        fixtures: response.data,
+      },
+    };
+  } catch (err) {
     return {
       props: {
         fixtures: [],
       },
     };
   }
-
-  return {
-    props: {
-      fixtures: response.data,
-    },
-  };
 };
 
 export default function Home({ fixtures }: HomeProps) {

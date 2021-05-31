@@ -12,14 +12,11 @@ import (
 // SetRoutes creates the handlers and routes for those handlers
 func (s Server) SetRoutes() {
 	// Handlers
-	cast := handlers.NewCastHandler(s.EventBus)
 	chrome := chromecast.NewChromecastHandler(s.EventBus)
 	chrome.Routes(s.Router)
 
 	live := livestream.NewLiveStreamHandler(s.Config.LiveStreamURL, s.Config.APIKey)
 	live.Routes(s.Router)
-
-	CastRoutes(s.Router, cast)
 
 	s.Router.PathPrefix("/").Handler(http.FileServer(http.Dir("public/")))
 }

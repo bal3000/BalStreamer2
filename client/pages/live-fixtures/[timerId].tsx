@@ -17,6 +17,8 @@ export const getServerSideProps: GetServerSideProps<LiveFixtureDetailsProps> =
       `/api/livestreams/${query.timerId}`
     );
 
+    console.log(streams);
+
     return {
       props: {
         streams,
