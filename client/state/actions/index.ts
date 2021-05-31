@@ -7,23 +7,23 @@ export interface SelectFixtureAction {
   payload: LiveFixture;
 }
 
-// export interface FetchChromecastsAction {
-//   type: ActionType.FETCH_CHROMECASTS;
-// }
+export interface FetchChromecastsAction {
+  type: ActionType.FETCH_CHROMECASTS;
+}
 
-// export interface FetchChromecastsCompleteAction {
-//   type: ActionType.FETCH_CHROMECASTS_COMPLETE;
-//   payload: Chromecast[];
-// }
+export interface FetchChromecastsCompleteAction {
+  type: ActionType.FETCH_CHROMECASTS_COMPLETE;
+  payload: string[];
+}
 
-// export interface FetchChromecastsErrorAction {
-//   type: ActionType.FETCH_CHROMECASTS_ERROR;
-//   payload: string;
-// }
+export interface FetchChromecastsErrorAction {
+  type: ActionType.FETCH_CHROMECASTS_ERROR;
+  payload: string;
+}
 
 export interface SelectChromecastAction {
   type: ActionType.SELECT_CHROMECAST;
-  payload: Chromecast;
+  payload: string;
 }
 
 export interface AddChromecastAction {
@@ -38,9 +38,9 @@ export interface RemoveChromecastAction {
 
 export type Actions =
   | SelectFixtureAction
-  //   | FetchChromecastsAction
-  //   | FetchChromecastsCompleteAction
-  //   | FetchChromecastsErrorAction
+  | FetchChromecastsAction
+  | FetchChromecastsCompleteAction
+  | FetchChromecastsErrorAction
   | SelectChromecastAction
   | AddChromecastAction
   | RemoveChromecastAction;

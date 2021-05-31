@@ -1,34 +1,22 @@
 import { useEffect } from 'react';
 import Link from 'next/link';
 
-import { useActions } from '../../hooks';
-import { ChromecastEventType } from '../../models/chromecast-event-types';
+import { useActions, useTypedSelector } from '../../hooks';
 import Chromecasts from '../chromecasts/chromecasts';
-import { Chromecast } from '../../models/chromecast';
 
 function Header() {
-  const { addChromecast, removeChromecast } = useActions();
+  const { fetchChromecasts, selectChromecast } = useActions();
+  const chromcastState = useTypedSelector(({ chromecasts }) => chromecasts);
 
   useEffect(() => {
-    const socket = new WebSocket('ws://localhost:8080/chromecasts');
-
-    // Connection opened
-    socket.addEventListener('open', () => {
-      console.log('Connection opened');
-    });
-
-    // Listen for messages
-    socket.addEventListener('message', (event: MessageEvent<Chromecast>) => {
-      console.log(`Message recieved ${JSON.stringify(event.data)}`);
-      const { messageType } = event.data;
-      if (messageType === ChromecastEventType.ChromecastFoundEvent.toString()) {
-        addChromecast(event.data);
-      }
-      if (messageType === ChromecastEventType.ChromecastLostEvent.toString()) {
-        removeChromecast(event.data);
-      }
-    });
+    fetchChromecasts();
   }, []);
+
+  const selectedChromecast = (chromecast: string) => {
+    if (chromecast !== chromcastState?.selectedChromecast) {
+      selectChromecast(chromecast);
+    }
+  };
 
   return (
     <>
@@ -42,8 +30,14 @@ function Header() {
                   Found chromecasts are listed to the side
                 </p>
               </div>
-              <div className='col-sm-4 offset-md-1 py-4'>
-                <Chromecasts />
+              <div className='col-sm-4 offset-md-1 py-4 text-white'>
+                <Chromecasts
+                  chromecasts={chromcastState?.chromecasts}
+                  loading={chromcastState?.loading}
+                  error={chromcastState?.error}
+                  selectedChromecast={chromcastState?.selectedChromecast}
+                  onSelect={selectedChromecast}
+                />
               </div>
             </div>
           </div>
