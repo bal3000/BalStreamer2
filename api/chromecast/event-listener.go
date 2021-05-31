@@ -4,7 +4,6 @@ import (
 	"encoding/json"
 	"fmt"
 	"log"
-	"time"
 
 	"github.com/bal3000/BalStreamer2/api/eventbus"
 	"github.com/bal3000/BalStreamer2/api/models"
@@ -49,22 +48,22 @@ func (el *EventListener) StartListening() error {
 	// }()
 
 	// wait 5 mins max between chromocast finds
-	timer := time.NewTimer(5 * time.Minute)
-	go func() {
-		<-timer.C
-		log.Println("timeout reached closing channel")
-		close(handledMsgs)
-	}()
+	// timer := time.NewTimer(5 * time.Minute)
+	// go func() {
+	// 	<-timer.C
+	// 	log.Println("timeout reached closing channel")
+	// 	close(handledMsgs)
+	// }()
 
 	for msg := range handledMsgs {
 		switch msg.MessageType {
 		case latestEventType:
 			continue
 		case foundEventType:
-			timer.Reset(5 * time.Minute)
+			// timer.Reset(5 * time.Minute)
 			el.Chromecasts[msg.Chromecast] = true
 		case lostEventType:
-			timer.Reset(5 * time.Minute)
+			// timer.Reset(5 * time.Minute)
 			el.Chromecasts[msg.Chromecast] = false
 		}
 	}

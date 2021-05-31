@@ -17,5 +17,5 @@ func (message *StopPlayingStreamEvent) TransformMessage() ([]byte, string, error
 	if err != nil {
 		return nil, "", err
 	}
-	return data, "StopPlayingStreamEvent", nil
+	return data, "StopStreamEvent", nil
 }

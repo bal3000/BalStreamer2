@@ -4,7 +4,6 @@ import (
 	"encoding/json"
 	"log"
 	"net/http"
-	"time"
 
 	"github.com/bal3000/BalStreamer2/api/eventbus"
 )
@@ -70,9 +69,8 @@ func (handler ChromecastHandler) CastStream(res http.ResponseWriter, req *http.R
 
 	// Send to chromecast
 	cast := &StreamToChromecastEvent{
-		ChromeCastToStream: castCommand.Chromecast,
-		Stream:             castCommand.StreamURL,
-		StreamDate:         time.Now(),
+		Chromecast: castCommand.Chromecast,
+		StreamURL:  castCommand.StreamURL,
 	}
 
 	if err := handler.eventbus.SendMessage(routingKey, cast); err != nil {
