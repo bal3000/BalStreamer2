@@ -39,11 +39,8 @@ func (handler ChromecastHandler) GetChromecasts(w http.ResponseWriter, r *http.R
 		return
 	}
 
-	log.Println("chromecast length", len(handler.chromecasts))
-
 	casts := make([]string, len(handler.chromecasts)-1)
 	for k := range handler.chromecasts {
-		log.Println("chromecast key", k)
 		casts = append(casts, k)
 	}
 
