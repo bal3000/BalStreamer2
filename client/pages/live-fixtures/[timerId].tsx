@@ -53,6 +53,9 @@ export default function LiveFixtureDetails({
       {fixture && <StreamOverview fixture={fixture} />}
       <StreamDetails
         cast={() => castStream()}
+        rmtp={streams.rtmp}
+        hls={streams.hls}
+        dash={streams.dash}
         selectedChromecast={selectedChromecast}
       />
     </>
