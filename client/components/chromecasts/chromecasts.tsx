@@ -37,10 +37,6 @@ function Chromecasts({
     return <span className='badge bg-danger'>{error}</span>;
   }
 
-  if (!selectedChromecast) {
-    onSelect(chromecasts[0]);
-  }
-
   return (
     <div className='row row-cols-1 row-cols-sm-2 row-cols-md-3 row-cols-lg-4 g-4 py-5'>
       {chromecasts.map((chromecast) => (

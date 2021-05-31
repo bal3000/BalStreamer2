@@ -29,6 +29,9 @@ export default function LiveFixtureDetails({
 }: LiveFixtureDetailsProps) {
   const router = useRouter();
   const fixture = useTypedSelector(({ fixture }) => fixture?.selectedFixture);
+  const selectedChromecast = useTypedSelector(
+    ({ chromecasts }) => chromecasts?.selectedChromecast
+  );
 
   // TODO:  if null e.g. direct link, call api and re fetch data and set the selected fixture
   if (!fixture) {
@@ -36,7 +39,7 @@ export default function LiveFixtureDetails({
 
   const castStream = async () => {
     await streamerApi.post('/api/cast', {
-      chromecast: 'STILL TO GET',
+      chromecast: selectedChromecast,
       streamURL: streams.rtmp,
     });
 
@@ -46,7 +49,10 @@ export default function LiveFixtureDetails({
   return (
     <>
       {fixture && <StreamOverview fixture={fixture} />}
-      <StreamDetails cast={() => castStream()} />
+      <StreamDetails
+        cast={() => castStream()}
+        selectedChromecast={selectedChromecast}
+      />
     </>
   );
 }

@@ -1,8 +1,9 @@
 interface StreamDetailsProps {
+  selectedChromecast: string | null | undefined;
   cast: () => void;
 }
 
-function StreamDetails({ cast }: StreamDetailsProps) {
+function StreamDetails({ selectedChromecast, cast }: StreamDetailsProps) {
   return (
     <div className='row row-cols-1 row-cols-md-3 mb-3 text-center'>
       <div className='col'>
@@ -14,6 +15,7 @@ function StreamDetails({ cast }: StreamDetailsProps) {
             <button
               type='button'
               className='w-100 btn btn-lg btn-outline-primary'
+              disabled={!selectedChromecast}
               onClick={() => cast()}
             >
               Cast

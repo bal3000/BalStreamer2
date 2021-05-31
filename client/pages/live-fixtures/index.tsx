@@ -12,15 +12,20 @@ interface LiveFixturesPageProps {
 }
 
 const livestreamApi = async (sportType: SportType): Promise<LiveFixture[]> => {
-  const today = new Date().toISOString().split('T')[0];
-  const response = await streamerApi.get<LiveFixture[]>(
-    `/api/livestreams/${sportType}/${today}/${today}`
-  );
+  try {
+    const today = new Date().toISOString().split('T')[0];
+    const response = await streamerApi.get<LiveFixture[]>(
+      `/api/livestreams/${sportType}/${today}/${today}`
+    );
 
-  if (response.status !== 200) {
+    if (response.status !== 200) {
+      return [];
+    }
+    return response.data;
+  } catch (err) {
+    console.log(err);
     return [];
   }
-  return response.data;
 };
 
 export const getServerSideProps: GetServerSideProps<LiveFixturesPageProps> =

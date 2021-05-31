@@ -1,7 +1,7 @@
 import axios from 'axios';
 
 const streamerApi = axios.create({
-  baseURL: 'http://localhost:8080',
+  baseURL: 'http://192.168.4.57:8080',
 });
 
 export default streamerApi;
