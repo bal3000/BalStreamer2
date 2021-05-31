@@ -39,8 +39,16 @@ func (handler ChromecastHandler) GetChromecasts(w http.ResponseWriter, r *http.R
 		return
 	}
 
+	log.Println("chromecast length", len(handler.chromecasts))
+
+	casts := make([]string, len(handler.chromecasts)-1)
+	for k := range handler.chromecasts {
+		log.Println("chromecast key", k)
+		casts = append(casts, k)
+	}
+
 	w.WriteHeader(http.StatusOK)
-	if err := json.NewEncoder(w).Encode(handler.chromecasts); err != nil {
+	if err := json.NewEncoder(w).Encode(casts); err != nil {
 		log.Printf("Failed to send json back to client, %v", err)
 	}
 }

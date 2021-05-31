@@ -26,7 +26,7 @@ type EventListener struct {
 }
 
 func NewEventListener(bus eventbus.EventBus) *EventListener {
-	return &EventListener{eventbus: bus}
+	return &EventListener{eventbus: bus, Chromecasts: make(map[string]bool)}
 }
 
 func (el *EventListener) StartListening() error {
