@@ -42,6 +42,7 @@ function Chromecasts({
       {chromecasts.map((chromecast) => (
         <div
           key={chromecast}
+          role='button'
           className='col d-flex align-items-start'
           onClick={() => onSelect(chromecast)}
         >
