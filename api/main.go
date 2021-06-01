@@ -5,15 +5,15 @@ import (
 	"os"
 
 	"github.com/bal3000/BalStreamer2/api/app"
+	"github.com/bal3000/BalStreamer2/api/config"
 	"github.com/bal3000/BalStreamer2/api/eventbus"
-	"github.com/bal3000/BalStreamer2/api/infrastructure"
 	"github.com/gorilla/mux"
 )
 
-var config infrastructure.Configuration
+var configuration config.Configuration
 
 func init() {
-	config = infrastructure.ReadConfig()
+	configuration = config.ReadConfig()
 }
 
 func main() {
@@ -25,7 +25,7 @@ func main() {
 
 func run() error {
 	//setup rabbit
-	rabbit, closer, err := eventbus.NewRabbitMQConnection(config)
+	rabbit, closer, err := eventbus.NewRabbitMQConnection(configuration)
 	if err != nil {
 		return err
 	}
@@ -34,6 +34,6 @@ func run() error {
 	// set up g mux router
 	r := mux.NewRouter()
 
-	server := app.NewServer(rabbit, r, config)
+	server := app.NewServer(rabbit, r, configuration)
 	return server.Run()
 }

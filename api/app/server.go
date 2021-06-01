@@ -8,18 +8,18 @@ import (
 	"os/signal"
 	"time"
 
+	"github.com/bal3000/BalStreamer2/api/config"
 	"github.com/bal3000/BalStreamer2/api/eventbus"
-	"github.com/bal3000/BalStreamer2/api/infrastructure"
 	"github.com/gorilla/mux"
 )
 
 type Server struct {
 	EventBus eventbus.EventBus
 	Router   *mux.Router
-	Config   infrastructure.Configuration
+	Config   config.Configuration
 }
 
-func NewServer(eventbus eventbus.EventBus, r *mux.Router, config infrastructure.Configuration) Server {
+func NewServer(eventbus eventbus.EventBus, r *mux.Router, config config.Configuration) Server {
 	return Server{EventBus: eventbus, Router: r, Config: config}
 }
 

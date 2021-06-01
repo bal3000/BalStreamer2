@@ -6,7 +6,6 @@ import (
 	"log"
 
 	"github.com/bal3000/BalStreamer2/api/eventbus"
-	"github.com/bal3000/BalStreamer2/api/models"
 	"github.com/streadway/amqp"
 )
 
@@ -16,7 +15,7 @@ var (
 	latestEventType = "ChromecastLatestEvent"
 	foundEventType  = "ChromecastFoundEvent"
 	lostEventType   = "ChromecastLostEvent"
-	handledMsgs     = make(chan models.ChromecastEvent)
+	handledMsgs     = make(chan ChromecastEvent)
 )
 
 type EventListener struct {
@@ -38,7 +37,7 @@ func (el *EventListener) StartListening() error {
 	}
 
 	// send all chromecasts from last refresh to page
-	go el.eventbus.SendMessage(routingKey, &models.GetLatestChromecastEvent{MessageType: latestEventType})
+	go el.eventbus.SendMessage(routingKey, &GetLatestChromecastEvent{MessageType: latestEventType})
 
 	// // close handle when context cancelled
 	// go func() {
@@ -73,7 +72,7 @@ func (el *EventListener) StartListening() error {
 
 func processMsgs(d amqp.Delivery) bool {
 	fmt.Printf("processing message: %s, with type: %s", string(d.Body), d.Type)
-	event := new(models.ChromecastEvent)
+	event := new(ChromecastEvent)
 
 	// convert mass transit message
 	err := json.Unmarshal(d.Body, event)

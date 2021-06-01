@@ -5,13 +5,13 @@ import (
 	"fmt"
 	"log"
 
-	"github.com/bal3000/BalStreamer2/api/infrastructure"
+	"github.com/bal3000/BalStreamer2/api/config"
 	"github.com/streadway/amqp"
 )
 
 // RabbitMQConnection - settings to create a connection
 type rabbitMQConnection struct {
-	configuration infrastructure.Configuration
+	configuration config.Configuration
 	channel       *amqp.Channel
 }
 
@@ -25,7 +25,7 @@ func (err rabbitError) Error() string {
 }
 
 // NewRabbitMQConnection creates a new rabbit mq connection
-func NewRabbitMQConnection(config infrastructure.Configuration) (*rabbitMQConnection, func(), error) {
+func NewRabbitMQConnection(config config.Configuration) (*rabbitMQConnection, func(), error) {
 	conn, err := amqp.Dial(config.RabbitURL)
 	if err != nil {
 		return nil, nil, err
