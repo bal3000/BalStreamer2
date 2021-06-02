@@ -70,6 +70,20 @@ export const nowCasting = (castDetails: CastedFixture): NowCastingAction => {
   };
 };
 
-export const stoppedCasting = (): StoppedCastingAction => {
-  return { type: ActionType.STOPPED_CASTING };
+export const stoppedCasting = (chromeCastToStop: string) => {
+  return async (dispatch: Dispatch<Actions>) => {
+    dispatch({ type: ActionType.STOPPED_CASTING });
+
+    try {
+      await streamerApi.delete('/api/cast', {
+        data: {
+          chromeCastToStop,
+          stopDateTime: new Date(),
+        },
+      });
+    } catch (err) {
+      // todo: add error action
+      console.log(err);
+    }
+  };
 };

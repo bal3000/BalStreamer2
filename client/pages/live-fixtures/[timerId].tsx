@@ -1,4 +1,5 @@
 import { GetServerSideProps } from 'next';
+import { useRouter } from 'next/router';
 
 import { useTypedSelector, useActions } from '../../hooks';
 import StreamOverview from '../../components/streams/stream-overview';
@@ -45,6 +46,7 @@ export default function LiveFixtureDetails({
   streams,
   currentFixture,
 }: LiveFixtureDetailsProps) {
+  const router = useRouter();
   const fixture = useTypedSelector(({ fixture }) => fixture?.selectedFixture);
   const selectedChromecast = useTypedSelector(
     ({ chromecasts }) => chromecasts?.selectedChromecast
@@ -66,7 +68,7 @@ export default function LiveFixtureDetails({
       chromecast: selectedChromecast!,
     });
 
-    window.location.href = '/';
+    router.push('/');
   };
 
   return (
