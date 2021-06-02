@@ -6,11 +6,14 @@ import { ActionType } from '../action-types';
 import {
   Actions,
   AddChromecastAction,
+  NowCastingAction,
   RemoveChromecastAction,
   SelectChromecastAction,
   SelectFixtureAction,
+  StoppedCastingAction,
 } from '../actions';
 import streamerApi from '../../helpers/api-caller';
+import { CastedFixture } from '../../models/casted-fixture';
 
 export const selectFixture = (fixture: LiveFixture): SelectFixtureAction => {
   return {
@@ -58,4 +61,15 @@ export const fetchChromecasts = () => {
       });
     }
   };
+};
+
+export const nowCasting = (castDetails: CastedFixture): NowCastingAction => {
+  return {
+    type: ActionType.NOW_CASTING,
+    payload: castDetails,
+  };
+};
+
+export const stoppedCasting = (): StoppedCastingAction => {
+  return { type: ActionType.STOPPED_CASTING };
 };

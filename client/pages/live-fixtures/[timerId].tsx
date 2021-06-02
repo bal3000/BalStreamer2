@@ -49,7 +49,7 @@ export default function LiveFixtureDetails({
   const selectedChromecast = useTypedSelector(
     ({ chromecasts }) => chromecasts?.selectedChromecast
   );
-  const { selectFixture } = useActions();
+  const { selectFixture, nowCasting } = useActions();
 
   if (!fixture && currentFixture) {
     selectFixture(currentFixture);
@@ -59,6 +59,11 @@ export default function LiveFixtureDetails({
     await streamerApi.post('/api/cast', {
       chromecast: selectedChromecast,
       streamURL: streams.rtmp,
+    });
+
+    nowCasting({
+      fixture: `${fixture?.title} - ${fixture?.broadcastChannelName}`,
+      chromecast: selectedChromecast!,
     });
 
     window.location.href = '/';

@@ -6,4 +6,6 @@ export enum ActionType {
   ADD_CHROMECAST = 'add_chromecast',
   REMOVE_CHROMECAST = 'remove_chromecast',
   SELECT_CHROMECAST = 'select_chromecast',
+  NOW_CASTING = 'now_casting',
+  STOPPED_CASTING = 'stopped_casting',
 }

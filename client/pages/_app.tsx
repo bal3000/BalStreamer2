@@ -7,6 +7,7 @@ import Header from '../components/header/header';
 
 import 'bootstrap/dist/css/bootstrap.css';
 import '../styles/globals.css';
+import CurrentPlaying from '../components/chromecasts/current-playing';
 
 function MyApp({ Component, pageProps }: AppProps) {
   return (
@@ -18,6 +19,7 @@ function MyApp({ Component, pageProps }: AppProps) {
       <Provider store={store}>
         <Header />
         <main role='main'>
+          <CurrentPlaying />
           <div className='container'>
             <Component {...pageProps} />
           </div>

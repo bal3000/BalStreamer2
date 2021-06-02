@@ -1,4 +1,5 @@
 import produce from 'immer';
+import { CastedFixture } from '../../models/casted-fixture';
 
 import { ActionType } from '../action-types';
 import { Actions } from '../actions';
@@ -8,6 +9,7 @@ interface ChromecastState {
   selectedChromecast: string | null;
   error: string | null;
   loading: boolean;
+  currentlyCasting: CastedFixture | null;
 }
 
 const initialState: ChromecastState = {
@@ -15,6 +17,7 @@ const initialState: ChromecastState = {
   selectedChromecast: null,
   error: null,
   loading: false,
+  currentlyCasting: null,
 };
 
 const reducer = produce(
@@ -48,6 +51,12 @@ const reducer = produce(
         if (index > 0) {
           state.chromecasts.splice(index, 1);
         }
+        return state;
+      case ActionType.NOW_CASTING:
+        state.currentlyCasting = action.payload;
+        return state;
+      case ActionType.STOPPED_CASTING:
+        state.currentlyCasting = null;
         return state;
       default:
         return state;

@@ -1,3 +1,4 @@
+import { CastedFixture } from '../../models/casted-fixture';
 import { Chromecast } from '../../models/chromecast';
 import { LiveFixture } from '../../models/live-fixture';
 import { ActionType } from '../action-types';
@@ -36,6 +37,15 @@ export interface RemoveChromecastAction {
   payload: Chromecast;
 }
 
+export interface NowCastingAction {
+  type: ActionType.NOW_CASTING;
+  payload: CastedFixture;
+}
+
+export interface StoppedCastingAction {
+  type: ActionType.STOPPED_CASTING;
+}
+
 export type Actions =
   | SelectFixtureAction
   | FetchChromecastsAction
@@ -43,4 +53,6 @@ export type Actions =
   | FetchChromecastsErrorAction
   | SelectChromecastAction
   | AddChromecastAction
-  | RemoveChromecastAction;
+  | RemoveChromecastAction
+  | NowCastingAction
+  | StoppedCastingAction;
