@@ -8,19 +8,21 @@ import (
 	"os/signal"
 	"time"
 
+	"github.com/bal3000/BalStreamer2/api/chromecast"
 	"github.com/bal3000/BalStreamer2/api/config"
 	"github.com/bal3000/BalStreamer2/api/eventbus"
 	"github.com/gorilla/mux"
 )
 
 type Server struct {
-	EventBus eventbus.EventBus
-	Router   *mux.Router
-	Config   config.Configuration
+	EventBus            eventbus.EventBus
+	ChromecastDatastore chromecast.DataStore
+	Router              *mux.Router
+	Config              config.Configuration
 }
 
-func NewServer(eventbus eventbus.EventBus, r *mux.Router, config config.Configuration) Server {
-	return Server{EventBus: eventbus, Router: r, Config: config}
+func NewServer(eventbus eventbus.EventBus, cdatastore chromecast.DataStore, r *mux.Router, config config.Configuration) Server {
+	return Server{EventBus: eventbus, ChromecastDatastore: cdatastore, Router: r, Config: config}
 }
 
 func (s Server) Run() error {

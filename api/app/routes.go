@@ -10,7 +10,7 @@ import (
 // SetRoutes creates the handlers and routes for those handlers
 func (s Server) SetRoutes() {
 	// Handlers
-	chrome := chromecast.NewChromecastHandler(s.EventBus)
+	chrome := chromecast.NewChromecastHandler(s.EventBus, s.ChromecastDatastore)
 	chrome.Routes(s.Router)
 
 	live := livestream.NewLiveStreamHandler(s.Config.LiveStreamURL, s.Config.APIKey)

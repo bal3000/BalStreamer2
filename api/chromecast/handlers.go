@@ -10,10 +10,11 @@ import (
 
 type ChromecastHandler struct {
 	eventbus    eventbus.EventBus
+	datastore   DataStore
 	chromecasts map[string]bool
 }
 
-func NewChromecastHandler(eb eventbus.EventBus) ChromecastHandler {
+func NewChromecastHandler(eb eventbus.EventBus, ds DataStore) ChromecastHandler {
 	// Start listening to events
 	listener := NewEventListener(eb)
 	go func() {
@@ -23,7 +24,7 @@ func NewChromecastHandler(eb eventbus.EventBus) ChromecastHandler {
 		}
 	}()
 
-	return ChromecastHandler{eventbus: eb, chromecasts: listener.Chromecasts}
+	return ChromecastHandler{eventbus: eb, datastore: ds, chromecasts: listener.Chromecasts}
 }
 
 func (handler ChromecastHandler) GetChromecasts(w http.ResponseWriter, r *http.Request) {

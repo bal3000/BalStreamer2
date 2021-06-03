@@ -1,10 +1,12 @@
 package main
 
 import (
+	"context"
 	"fmt"
 	"os"
 
 	"github.com/bal3000/BalStreamer2/api/app"
+	"github.com/bal3000/BalStreamer2/api/chromecast"
 	"github.com/bal3000/BalStreamer2/api/config"
 	"github.com/bal3000/BalStreamer2/api/eventbus"
 	"github.com/gorilla/mux"
@@ -31,9 +33,16 @@ func run() error {
 	}
 	defer closer()
 
+	// setup chromecast db
+	mongo, dbCloser, err := chromecast.NewChromecastMongoStore(context.Background(), "")
+	if err != nil {
+		return err
+	}
+	defer dbCloser()
+
 	// set up g mux router
 	r := mux.NewRouter()
 
-	server := app.NewServer(rabbit, r, configuration)
+	server := app.NewServer(rabbit, mongo, r, configuration)
 	return server.Run()
 }

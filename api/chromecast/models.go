@@ -19,3 +19,9 @@ type ChromecastEvent struct {
 	Chromecast  string `json:"chromecast"`
 	MessageType string `json:"messageType"`
 }
+
+// db model for current playing event
+type CurrentlyPlaying struct {
+	fixture    string `json:"fixture" bson:"fixture,omitempty"`
+	chromecast string `json:"chromecast" bson:"chromecast,omitempty"`
+}
