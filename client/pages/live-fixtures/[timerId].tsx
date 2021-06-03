@@ -60,6 +60,7 @@ export default function LiveFixtureDetails({
   const castStream = async () => {
     await streamerApi.post('/api/cast', {
       chromecast: selectedChromecast,
+      fixture: `${fixture?.title} - ${fixture?.broadcastChannelName}`,
       streamURL: streams.rtmp,
     });
 

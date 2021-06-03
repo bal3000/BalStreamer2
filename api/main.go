@@ -34,7 +34,7 @@ func run() error {
 	defer closer()
 
 	// setup chromecast db
-	mongo, dbCloser, err := chromecast.NewChromecastMongoStore(context.Background(), "")
+	mongo, dbCloser, err := chromecast.NewChromecastMongoStore(context.Background(), configuration.ConnectionString)
 	if err != nil {
 		return err
 	}
