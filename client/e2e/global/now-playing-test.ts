@@ -17,7 +17,7 @@ test.page('http://localhost:3000/?ff=1')(
   'Check currently playing div is active with feature flag',
   async (t) => {
     const nowplaying = Selector('#now-playing');
-    const stopButton = nowplaying.child('button#stop-playing');
+    const stopButton = Selector('#stop-playing');
 
     await t.expect(nowplaying.exists).ok('now playing should exist');
     await t.expect(stopButton.exists).ok('stop button should exist');
@@ -27,8 +27,7 @@ test.page('http://localhost:3000/?ff=1')(
 test.page('http://localhost:3000/?ff=1')(
   'Check currently playing div is not active',
   async (t) => {
-    const nowplaying = Selector('#now-playing');
-    const stopButton = nowplaying.child('button#stop-playing');
+    const stopButton = Selector('#stop-playing');
 
     await t
       .click(stopButton)
