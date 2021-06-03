@@ -49,8 +49,8 @@ function Header() {
                 <a className='navbar-brand d-flex align-items-center'>
                   <svg
                     xmlns='http://www.w3.org/2000/svg'
-                    width='50'
-                    height='50'
+                    width='20'
+                    height='20'
                     fill='none'
                     stroke='currentColor'
                     strokeLinecap='round'
@@ -69,15 +69,15 @@ function Header() {
                       d='M7.293 1.5a1 1 0 0 1 1.414 0l6.647 6.646a.5.5 0 0 1-.708.708L8 2.207 1.354 8.854a.5.5 0 1 1-.708-.708L7.293 1.5z'
                     />
                   </svg>
-                  <strong>Home</strong>
+                  <span>Home</span>
                 </a>
               </Link>
               <Link href='/live-fixtures'>
                 <a className='navbar-brand d-flex align-items-center'>
                   <svg
                     xmlns='http://www.w3.org/2000/svg'
-                    width='50'
-                    height='50'
+                    width='20'
+                    height='20'
                     fill='none'
                     stroke='currentColor'
                     strokeLinecap='round'
@@ -91,7 +91,7 @@ function Header() {
                       d='M0 5a2 2 0 0 1 2-2h7.5a2 2 0 0 1 1.983 1.738l3.11-1.382A1 1 0 0 1 16 4.269v7.462a1 1 0 0 1-1.406.913l-3.111-1.382A2 2 0 0 1 9.5 13H2a2 2 0 0 1-2-2V5z'
                     />
                   </svg>
-                  <strong>Live Matches</strong>
+                  <span>Live Matches</span>
                 </a>
               </Link>
             </div>
