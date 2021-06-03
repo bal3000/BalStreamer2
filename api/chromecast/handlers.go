@@ -78,6 +78,17 @@ func (handler ChromecastHandler) CastStream(res http.ResponseWriter, req *http.R
 		log.Fatalln(err)
 	}
 
+	// save to db
+	err := handler.datastore.SaveCurrentlyPlaying(req.Context(), CurrentlyPlaying{
+		Fixture:    castCommand.Fixture,
+		Chromecast: castCommand.Chromecast,
+	})
+	if err != nil {
+		log.Println(err)
+		http.Error(res, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)
+		return
+	}
+
 	res.WriteHeader(http.StatusNoContent)
 }
 
@@ -109,5 +120,40 @@ func (handler ChromecastHandler) StopStream(res http.ResponseWriter, req *http.R
 		log.Fatalln(err)
 	}
 
+	// delete from db
+	err := handler.datastore.DeleteCurrentPlaying(req.Context(), stopStreamCommand.ChromeCastToStop)
+	if err != nil {
+		log.Println(err)
+		http.Error(res, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)
+		return
+	}
+
 	res.WriteHeader(http.StatusAccepted)
+}
+
+func (handler ChromecastHandler) GetCurrentlyPlayingStream(w http.ResponseWriter, r *http.Request) {
+	w.Header().Set("content-type", "application/json")
+	w.Header().Set("Access-Control-Allow-Origin", "*")
+
+	if r.Method == http.MethodOptions {
+		return
+	}
+
+	playing, err := handler.datastore.GetCurrentlyPlaying(r.Context())
+	if err != nil {
+		log.Println(err)
+		http.Error(w, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)
+		return
+	}
+
+	if len(playing) == 0 {
+		http.NotFound(w, r)
+		return
+	}
+
+	w.WriteHeader(http.StatusOK)
+	if err := json.NewEncoder(w).Encode(playing); err != nil {
+		log.Println(err)
+		http.Error(w, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)
+	}
 }

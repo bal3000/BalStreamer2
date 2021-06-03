@@ -46,7 +46,7 @@ func (ds *ChromecastMongoStore) SaveCurrentlyPlaying(ctx context.Context, cp Cur
 	database := ds.dbClient.Database("balstreamer")
 	col := database.Collection("currentplaying")
 
-	result := col.FindOneAndReplace(timeoutCtx, bson.M{"chromecast": cp.chromecast}, cp)
+	result := col.FindOneAndReplace(timeoutCtx, bson.M{"chromecast": cp.Chromecast}, cp)
 	err := result.Err()
 	if err != nil {
 		if err == mongo.ErrNoDocuments {
@@ -85,4 +85,23 @@ func (ds *ChromecastMongoStore) GetCurrentlyPlaying(ctx context.Context) ([]Curr
 	}
 
 	return playing, nil
+}
+
+func (ds *ChromecastMongoStore) DeleteCurrentPlaying(ctx context.Context, chromecast string) error {
+	if ds == nil {
+		return errors.New("the data store has not been initialized")
+	}
+
+	timeoutCtx, cancel := context.WithTimeout(ctx, 10*time.Second)
+	defer cancel()
+
+	database := ds.dbClient.Database("balstreamer")
+	col := database.Collection("currentplaying")
+
+	_, err := col.DeleteOne(timeoutCtx, bson.M{"chromecast": chromecast})
+	if err != nil {
+		return err
+	}
+
+	return nil
 }

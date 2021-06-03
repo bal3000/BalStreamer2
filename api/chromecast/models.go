@@ -6,6 +6,7 @@ import "time"
 type StreamToCast struct {
 	Chromecast string `json:"chromecast"`
 	StreamURL  string `json:"streamURL"`
+	Fixture    string `json:"fixture"`
 }
 
 // StopPlayingStream is the model for the json posted to the stop casting endpoint
@@ -22,6 +23,6 @@ type ChromecastEvent struct {
 
 // db model for current playing event
 type CurrentlyPlaying struct {
-	fixture    string `json:"fixture" bson:"fixture,omitempty"`
-	chromecast string `json:"chromecast" bson:"chromecast,omitempty"`
+	Fixture    string `json:"fixture" bson:"fixture,omitempty"`
+	Chromecast string `json:"chromecast" bson:"chromecast,omitempty"`
 }
