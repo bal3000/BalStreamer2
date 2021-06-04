@@ -19,7 +19,7 @@ function MyApp({ Component, pageProps }: AppProps) {
       <Provider store={store}>
         <Header />
         <main role='main'>
-          <CurrentPlaying currentlyCasting={pageProps.currentlyPlaying} />
+          <CurrentPlaying />
           <div className='container'>
             <Component {...pageProps} />
           </div>
