@@ -9,7 +9,7 @@ interface ChromecastState {
   selectedChromecast: string | null;
   error: string | null;
   loading: boolean;
-  currentlyCasting: CastedFixture | null;
+  currentlyCasting: CastedFixture[];
 }
 
 const initialState: ChromecastState = {
@@ -17,7 +17,7 @@ const initialState: ChromecastState = {
   selectedChromecast: null,
   error: null,
   loading: false,
-  currentlyCasting: null,
+  currentlyCasting: [],
 };
 
 const reducer = produce(
@@ -56,7 +56,7 @@ const reducer = produce(
         state.currentlyCasting = action.payload;
         return state;
       case ActionType.STOPPED_CASTING:
-        state.currentlyCasting = null;
+        state.currentlyCasting = [];
         return state;
       default:
         return state;

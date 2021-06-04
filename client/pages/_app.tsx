@@ -4,10 +4,10 @@ import { Provider } from 'react-redux';
 
 import { store } from '../state';
 import Header from '../components/header/header';
+import CurrentPlaying from '../components/chromecasts/current-playing';
 
 import 'bootstrap/dist/css/bootstrap.css';
 import '../styles/globals.css';
-import CurrentPlaying from '../components/chromecasts/current-playing';
 
 function MyApp({ Component, pageProps }: AppProps) {
   return (
@@ -19,7 +19,7 @@ function MyApp({ Component, pageProps }: AppProps) {
       <Provider store={store}>
         <Header />
         <main role='main'>
-          <CurrentPlaying />
+          <CurrentPlaying currentlyCasting={pageProps.currentlyPlaying} />
           <div className='container'>
             <Component {...pageProps} />
           </div>
@@ -33,5 +33,25 @@ function MyApp({ Component, pageProps }: AppProps) {
     </>
   );
 }
+
+// MyApp.getInitialProps = async (appContext: AppContext) => {
+//   // calls page's `getInitialProps` and fills `appProps.pageProps`
+//   const appProps = await App.getInitialProps(appContext);
+//   let currentlyPlaying: CastedFixture[] = [];
+//   try {
+//     const { data } = await streamerApi.get<CastedFixture[]>(
+//       '/api/currentplaying'
+//     );
+//     currentlyPlaying = data;
+//   } catch (err) {
+//     if (err.response && err.response.status === 404) {
+//       currentlyPlaying = [];
+//     } else {
+//       console.log(err);
+//     }
+//   }
+
+//   return { ...appProps, currentlyPlaying };
+// };
 
 export default MyApp;

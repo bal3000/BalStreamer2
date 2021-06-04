@@ -39,7 +39,7 @@ export interface RemoveChromecastAction {
 
 export interface NowCastingAction {
   type: ActionType.NOW_CASTING;
-  payload: CastedFixture;
+  payload: CastedFixture[];
 }
 
 export interface StoppedCastingAction {

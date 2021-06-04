@@ -63,10 +63,17 @@ export const fetchChromecasts = () => {
   };
 };
 
-export const nowCasting = (castDetails: CastedFixture): NowCastingAction => {
-  return {
-    type: ActionType.NOW_CASTING,
-    payload: castDetails,
+export const getNowCasting = () => {
+  return async (dispatch: Dispatch<Actions>) => {
+    try {
+      const { data } = await streamerApi.get<CastedFixture[]>(
+        '/api/currentplaying'
+      );
+      dispatch({ type: ActionType.NOW_CASTING, payload: data });
+    } catch (err) {
+      // todo: add error action
+      console.log(err);
+    }
   };
 };
 
