@@ -149,7 +149,7 @@ func callApi(ctx context.Context, url string, apiKey string, body interface{}) e
 	}
 	defer response.Body.Close()
 
-	if response.StatusCode != http.StatusOK {
+	if response.StatusCode != http.StatusOK && response.StatusCode != http.StatusNotFound {
 		return fmt.Errorf("url, %s, returned a status code of: %v", url, response.StatusCode)
 	}
 
