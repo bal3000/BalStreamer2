@@ -149,6 +149,10 @@ func callApi(ctx context.Context, url string, apiKey string, body interface{}) e
 	}
 	defer response.Body.Close()
 
+	if response.StatusCode != http.StatusOK {
+		return fmt.Errorf("url, %s, returned a status code of: %v", url, response.StatusCode)
+	}
+
 	if err := json.NewDecoder(response.Body).Decode(body); err != nil {
 		return fmt.Errorf("failed to convert JSON, err: %w", err)
 	}
