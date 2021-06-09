@@ -7,6 +7,7 @@ const start = async () => {
     await rmq.openConnection();
 
     rmq.startConsumer('', '', (msg) => {
+      console.log(msg);
       return true;
     });
 
