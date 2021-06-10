@@ -1,4 +1,5 @@
 import { RabbitMQ } from './events/rabbit-mq';
+import { AutoPlayer } from './auto-player';
 import serve from './app';
 
 const start = async () => {
@@ -10,6 +11,9 @@ const start = async () => {
       console.log(msg);
       return true;
     });
+
+    const player = new AutoPlayer();
+    player.setTeam('Liverpool').setCountry('England').invoke();
 
     await serve(3001, rmq);
   } finally {
